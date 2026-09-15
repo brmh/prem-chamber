@@ -23,8 +23,6 @@ from guesswork, and a few are legally required.
 | `src/data/site.ts` → `barCouncil.enrolmentNo` | Enrolment number | The Bar Council expects enrolment details on an advocate's website. The footer and About page hide this block until it is filled. |
 | `src/data/site.ts` → `barCouncil.practisingSince` | Year of enrolment | Shown on the About page. |
 | `src/data/site.ts` → `chamber.pincode` | PIN of the Tehsil Compound | Currently `201001`. Confirm it. |
-| `src/data/site.ts` → `chamber.lat` / `lng` | Exact coordinates | Used in the LocalBusiness structured data that Google Maps reads. Drop a pin, copy the numbers. |
-| `src/data/site.ts` → `chamber.mapsUrl` | Google Business Profile link | The "Open in Google Maps" link on Contact stays hidden until this is set. |
 | `src/data/site.ts` → `hours` | Real chamber timings | Currently placeholders. These also go into the structured data. |
 | `src/data/site.ts` → `email` | `ankit@premchamber.com` | Set this up (Zoho Mail's free plan is enough) or change it back to the Gmail address. |
 | `src/data/offices.ts` | Sub-Registrar office addresses | **Deliberately left empty.** A wrong address on an advocate's site sends a client to the wrong building. Fill `address` for an office and it appears in the table automatically; offices with no address are skipped. |
@@ -88,6 +86,25 @@ Remove the entry once the position is filled — a stale vacancy is worse than n
 No stipend figure is printed anywhere on that page, deliberately. It varies, and the
 page says it is discussed directly instead.
 
+### Adding photographs of the chamber
+
+Photographs cannot be pulled from the Google Business Profile — Google publishes no
+keyless API for a listing's photos, and serving them from its CDN is against its
+terms. So the files have to live in this repository.
+
+Point the helper at a folder of originals:
+
+```bash
+./tools/prep-photos.sh ~/Desktop/chamber-photos
+```
+
+It writes 1600px copies into `public/photos/` and prints the entries to paste into
+`src/data/photos.ts`, where you replace the `TODO` alt text with a real description
+in both languages. Until something is listed there the gallery does not render at all.
+
+Photograph the chamber, the building and the work — not clients, and not their
+documents.
+
 ### Adding a service
 
 Copy an existing file in `src/data/services/`, change the content, then add it to
@@ -119,6 +136,11 @@ advocates. The site is built around this:
 - a first-visit disclaimer, dismissed once and remembered in the browser;
 - the short disclaimer in the footer of every page;
 - content written as information, not as promotion.
+
+The Google Business Profile is linked from the Contact page and a map is embedded
+there, which is factual location information and fine. **Its reviews are not, and
+must not be pulled onto the site** — testimonials are exactly what Rule 36 prohibits,
+and a reviews widget is the most common way an advocate's website breaches it.
 
 **Keep it this way.** Do not add "best lawyer in Ghaziabad", success rates, or client
 reviews. Beyond the professional risk, that kind of copy is exactly what makes a site

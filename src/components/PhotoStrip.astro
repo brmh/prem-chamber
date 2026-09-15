@@ -1,0 +1,53 @@
+---
+import type { Lang } from '../data/site';
+import { asset } from '../data/site';
+import { PHOTOS, photoAlt } from '../data/photos';
+
+/** Renders nothing until photographs are listed in src/data/photos.ts. */
+interface Props { lang: Lang; heading?: string; limit?: number }
+const { lang, heading, limit } = Astro.props;
+const hi = lang === 'hi';
+const shown = limit ? PHOTOS.slice(0, limit) : PHOTOS;
+if (!shown.length) return null;
+---
+
+<section class="strip">
+  <h2>{heading ?? (hi ? 'चैम्बर' : 'The chamber')}</h2>
+  <ul>
+    {shown.map((p, i) => (
+      <li>
+        <img
+          src={asset(`/photos/${p.file}`)}
+          alt={photoAlt(p, lang)}
+          width={p.width}
+          height={p.height}
+          loading={i === 0 ? 'eager' : 'lazy'}
+          decoding="async"
+        />
+      </li>
+    ))}
+  </ul>
+</section>
+
+<style>
+  .strip { margin-top: var(--s-7); }
+  .strip h2 { margin-top: 0; font-size: 1.1rem; }
+  .strip ul {
+    list-style: none;
+    padding: 0;
+    margin: var(--s-4) 0 0;
+    display: grid;
+    gap: var(--s-3);
+    grid-template-columns: repeat(2, 1fr);
+  }
+  @media (min-width: 760px) { .strip ul { grid-template-columns: repeat(3, 1fr); } }
+  .strip li { margin: 0; }
+  .strip img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--paper-2);
+  }
+</style>

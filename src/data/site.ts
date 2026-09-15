@@ -36,10 +36,14 @@ export const SITE = {
     state: 'Uttar Pradesh',
     stateHi: 'उत्तर प्रदेश',
     pincode: '201001', // VERIFY: confirm the Tehsil Compound PIN
-    /** VERIFY: drop a pin on Google Maps and paste the exact coordinates. */
-    lat: 28.6692,
-    lng: 77.4538,
-    mapsUrl: '', // VERIFY: paste the Google Business Profile short link
+    /** From the chamber's Google Business Profile listing. */
+    lat: 28.6543232,
+    lng: 77.4392537,
+    /** Google Business Profile: "Ankit Bhardwaj (Prem) Advocate". */
+    mapsUrl: 'https://maps.google.com/?cid=8538239549458894027',
+    /** Keyless embed — no API key, and it only loads when scrolled into view. */
+    mapEmbedUrl: 'https://maps.google.com/maps?q=28.6543232,77.4392537&z=16&hl=en&output=embed',
+    directionsUrl: 'https://www.google.com/maps/dir/?api=1&destination=28.6543232,77.4392537'
   },
 
   hours: {

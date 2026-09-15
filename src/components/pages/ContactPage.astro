@@ -5,6 +5,8 @@ import { t } from '../../i18n/ui';
 import Base from '../../layouts/Base.astro';
 import Breadcrumbs from '../Breadcrumbs.astro';
 import EnquiryForm from '../EnquiryForm.astro';
+import ChamberMap from '../ChamberMap.astro';
+import PhotoStrip from '../PhotoStrip.astro';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
@@ -52,9 +54,7 @@ const jsonLd = [
               {hi ? ch.line1Hi : ch.line1}<br />
               {hi ? ch.cityHi : ch.city}, {hi ? ch.stateHi : ch.state} {ch.pincode}
             </address>
-            {ch.mapsUrl && (
-              <p><a href={ch.mapsUrl} rel="noopener" target="_blank">{hi ? 'गूगल मैप पर देखिए' : 'Open in Google Maps'} &rarr;</a></p>
-            )}
+            <ChamberMap lang={lang} class="cbox__map" />
           </div>
 
           <div class="cbox">
@@ -102,6 +102,8 @@ const jsonLd = [
           </p>
         </div>
       </div>
+
+      <PhotoStrip lang={lang} />
     </div>
   </div>
 </Base>
@@ -128,6 +130,7 @@ const jsonLd = [
   }
   :global([lang='hi']) .cbox h2 { letter-spacing: 0.02em; text-transform: none; font-size: 0.84rem; }
   .cbox address { font-style: normal; font-size: 1.02rem; color: var(--ink); }
+  .cbox__map { margin-top: var(--s-4); }
   .cbig { font-family: var(--font-display); font-size: 1.5rem; margin-bottom: var(--s-4); }
   .cbig a { text-decoration: none; }
   .cbox--tip { background: var(--paper-2); border-color: var(--line); }

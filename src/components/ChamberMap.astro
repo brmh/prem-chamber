@@ -1,0 +1,63 @@
+---
+import type { Lang } from '../data/site';
+import { SITE } from '../data/site';
+
+/**
+ * The map is the one third-party thing on this site, so it is kept on a leash:
+ * a keyless embed, loaded only when it scrolls into view, and titled for screen
+ * readers. Nothing else here calls out to another domain.
+ */
+interface Props { lang: Lang; class?: string }
+const { lang, class: cls = '' } = Astro.props;
+const hi = lang === 'hi';
+const ch = SITE.chamber;
+---
+
+{ch.mapEmbedUrl && (
+  <figure class={`map ${cls}`}>
+    <iframe
+      src={ch.mapEmbedUrl}
+      title={hi ? 'चैम्बर का नक्शा' : 'Map to the chamber'}
+      loading="lazy"
+      referrerpolicy="no-referrer-when-downgrade"
+      allowfullscreen
+    ></iframe>
+    <figcaption>
+      <span>
+        {hi ? ch.line1Hi : ch.line1}, {hi ? ch.cityHi : ch.city}
+      </span>
+      <span class="map__links">
+        <a href={ch.directionsUrl} rel="noopener" target="_blank">
+          {hi ? 'रास्ता देखिए' : 'Get directions'}
+        </a>
+        <a href={ch.mapsUrl} rel="noopener" target="_blank">
+          {hi ? 'गूगल पर देखिए' : 'Open in Google Maps'}
+        </a>
+      </span>
+    </figcaption>
+  </figure>
+)}
+
+<style>
+  .map { margin: 0; }
+  .map iframe {
+    display: block;
+    width: 100%;
+    height: 300px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--paper-2);
+  }
+  .map figcaption {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-2) var(--s-4);
+    align-items: baseline;
+    justify-content: space-between;
+    margin-top: var(--s-3);
+    font-size: 0.86rem;
+    color: var(--ink-3);
+  }
+  .map__links { display: flex; gap: var(--s-4); }
+  @media (min-width: 900px) { .map iframe { height: 340px; } }
+</style>

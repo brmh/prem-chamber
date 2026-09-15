@@ -57,6 +57,7 @@ const business = {
     addressCountry: 'IN',
   },
   geo: { '@type': 'GeoCoordinates', latitude: ch.lat, longitude: ch.lng },
+  ...(ch.mapsUrl ? { hasMap: ch.mapsUrl, sameAs: [ch.mapsUrl] } : {}),
   areaServed: [
     { '@type': 'City', name: 'Ghaziabad' },
     { '@type': 'AdministrativeArea', name: 'Ghaziabad district' },
