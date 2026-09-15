@@ -1,0 +1,135 @@
+---
+import type { Lang } from '../data/site';
+import { SITE } from '../data/site';
+import { t } from '../i18n/ui';
+import { subjectOptions } from '../data/services/index';
+
+/**
+ * No backend, no database, no third-party form service. The form composes a
+ * WhatsApp message in the browser and hands it to the chamber's number, which
+ * is where these enquiries actually get answered. Nothing is stored here.
+ */
+interface Props { lang: Lang; subject?: string; compact?: boolean }
+const { lang, subject, compact = false } = Astro.props;
+const ui = t(lang);
+const subjects = subjectOptions(lang);
+---
+
+<form class={`enq ${compact ? 'enq--compact' : ''}`} id="enquiry-form" novalidate data-wa={SITE.whatsapp} data-lang={lang}>
+  <h2>{ui.form.heading}</h2>
+  <p class="enq__sub">{ui.form.sub}</p>
+
+  <div class="enq__row">
+    <label for="enq-name">{ui.form.name} <span aria-hidden="true">*</span></label>
+    <input id="enq-name" name="name" type="text" autocomplete="name" required />
+    <p class="enq__err" data-for="enq-name" hidden>{ui.form.errName}</p>
+  </div>
+
+  <div class="enq__row">
+    <label for="enq-phone">{ui.form.phone} <span aria-hidden="true">*</span></label>
+    <input id="enq-phone" name="phone" type="tel" inputmode="numeric" autocomplete="tel-national" maxlength="10" required />
+    <p class="enq__err" data-for="enq-phone" hidden>{ui.form.errPhone}</p>
+  </div>
+
+  <div class="enq__row">
+    <label for="enq-subject">{ui.form.subject} <span aria-hidden="true">*</span></label>
+    <select id="enq-subject" name="subject" required>
+      <option value="">{ui.form.subjectPlaceholder}</option>
+      {subjects.map((s) => <option value={s} selected={subject === s}>{s}</option>)}
+      <option value={lang === 'hi' ? 'कोई और मामला' : 'Something else'}>
+        {lang === 'hi' ? 'कोई और मामला' : 'Something else'}
+      </option>
+    </select>
+    <p class="enq__err" data-for="enq-subject" hidden>{ui.form.errSubject}</p>
+  </div>
+
+  <div class="enq__row">
+    <label for="enq-message">{ui.form.message}</label>
+    <textarea id="enq-message" name="message" rows="3" placeholder={ui.form.messagePlaceholder}></textarea>
+  </div>
+
+  <button type="submit" class="btn btn--brass enq__submit">{ui.form.submit}</button>
+  <p class="enq__note">{ui.form.submitNote}</p>
+</form>
+
+<script>
+  const form = document.getElementById('enquiry-form') as HTMLFormElement | null;
+
+  function showError(id: string, show: boolean) {
+    const el = form?.querySelector<HTMLElement>(`.enq__err[data-for="${id}"]`);
+    if (el) el.hidden = !show;
+    form?.querySelector(`#${id}`)?.setAttribute('aria-invalid', String(show));
+  }
+
+  form?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const data = new FormData(form);
+    const name = String(data.get('name') ?? '').trim();
+    const phone = String(data.get('phone') ?? '').replace(/\D/g, '');
+    const subject = String(data.get('subject') ?? '');
+    const message = String(data.get('message') ?? '').trim();
+
+    const nameBad = name.length < 2;
+    const phoneBad = phone.length !== 10;
+    const subjectBad = !subject;
+    showError('enq-name', nameBad);
+    showError('enq-phone', phoneBad);
+    showError('enq-subject', subjectBad);
+
+    if (nameBad || phoneBad || subjectBad) {
+      form.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus();
+      return;
+    }
+
+    const hi = form.dataset.lang === 'hi';
+    const lines = hi
+      ? [`नमस्ते, मेरा नाम ${name} है।`, `विषय: ${subject}`, `मोबाइल: ${phone}`]
+      : [`Hello, my name is ${name}.`, `Subject: ${subject}`, `Mobile: ${phone}`];
+    if (message) lines.push(hi ? `विवरण: ${message}` : `Details: ${message}`);
+
+    const url = `https://wa.me/${form.dataset.wa}?text=${encodeURIComponent(lines.join('\n'))}`;
+    window.open(url, '_blank', 'noopener');
+  });
+</script>
+
+<style>
+  .enq {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-top: 3px solid var(--brass-500);
+    border-radius: var(--radius);
+    padding: var(--s-6);
+  }
+  .enq h2 { margin-top: 0; font-size: 1.35rem; }
+  .enq__sub { color: var(--ink-2); font-size: 0.93rem; margin-bottom: var(--s-5); }
+  .enq__row { margin-bottom: var(--s-4); }
+  .enq label {
+    display: block;
+    font-size: 0.84rem;
+    font-weight: 600;
+    color: var(--green-900);
+    margin-bottom: 6px;
+  }
+  .enq label span { color: var(--brass-600); }
+  .enq input, .enq select, .enq textarea {
+    width: 100%;
+    padding: 11px 13px;
+    font-family: inherit;
+    font-size: 1rem;
+    color: var(--ink);
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+  }
+  .enq textarea { resize: vertical; }
+  .enq input:focus, .enq select:focus, .enq textarea:focus {
+    outline: 2px solid var(--green-600);
+    outline-offset: 1px;
+    background: #fff;
+  }
+  .enq [aria-invalid='true'] { border-color: var(--danger); }
+  .enq__err { color: var(--danger); font-size: 0.82rem; margin: 6px 0 0; }
+  .enq__submit { width: 100%; margin-top: var(--s-2); }
+  .enq__note { font-size: 0.79rem; color: var(--ink-3); margin: var(--s-3) 0 0; }
+  .enq--compact { padding: var(--s-5); }
+</style>

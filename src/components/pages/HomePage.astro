@@ -1,0 +1,283 @@
+---
+import { getCollection } from 'astro:content';
+import type { Lang } from '../../data/site';
+import { SITE, localePath } from '../../data/site';
+import { t } from '../../i18n/ui';
+import { HOME } from '../../i18n/pages';
+import { SERVICES, GROUPS } from '../../data/services/index';
+import Base from '../../layouts/Base.astro';
+import Faq from '../Faq.astro';
+import EnquiryForm from '../EnquiryForm.astro';
+import Seal from '../Seal.astro';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const ui = t(lang);
+const c = HOME[lang];
+const L = (p: string) => localePath(lang, p);
+const hi = lang === 'hi';
+const ch = SITE.chamber;
+
+const guides = (await getCollection('guides', (g) => g.data.lang === lang && g.data.featured)).sort(
+  (a, b) => a.data.order - b.data.order,
+);
+
+const groupKeys = ['property', 'family', 'documents'] as const;
+---
+
+<Base
+  lang={lang}
+  path="/"
+  title={ui.home.metaTitle}
+  description={ui.home.metaDesc}
+>
+  <section class="hero">
+    <div class="wrap hero__inner">
+      <div class="hero__text">
+        <p class="eyebrow">{c.eyebrow}</p>
+        <h1>{c.h1}</h1>
+        <p class="lede">{c.lede}</p>
+        <div class="btn-row">
+          <a class="btn btn--primary" href={`tel:${SITE.phone}`}>{ui.cta.call} · {SITE.phoneDisplay}</a>
+          <a class="btn btn--ghost" href={L('/contact')}>{ui.cta.appointment}</a>
+        </div>
+        <dl class="trust">
+          {c.trust.map((item) => (
+            <div>
+              <dt>{item.k}</dt>
+              <dd>{item.v}</dd>
+            </div>
+          ))}
+        </dl>
+      </div>
+      <aside class="hero__card">
+        <Seal size={54} />
+        <p class="hero__names">
+          {SITE.advocates.map((a) => (
+            <span>
+              <strong>{hi ? a.nameHi : a.name}</strong>
+              <em>{hi ? a.roleHi : a.role}</em>
+            </span>
+          ))}
+        </p>
+        <hr />
+        <p class="hero__addr">
+          {hi ? ch.line1Hi : ch.line1}<br />
+          {hi ? ch.cityHi : ch.city}, {hi ? ch.stateHi : ch.state}
+        </p>
+        <p class="hero__hours">{hi ? 'सोम–शुक्र' : 'Mon–Fri'} {SITE.hours.weekdays} · {hi ? 'शनि' : 'Sat'} {SITE.hours.saturday}</p>
+      </aside>
+    </div>
+  </section>
+
+  <section class="section section--paper2" id="situations">
+    <div class="wrap">
+      <p class="eyebrow">{c.routerEyebrow}</p>
+      <h2>{c.routerH2}</h2>
+      <p class="lede" style="max-width: 62ch">{c.routerSub}</p>
+      <ul class="router">
+        {c.router.map((r) => (
+          <li>
+            <a href={L(r.href)}>
+              <span class="router__q">{r.q}</span>
+              <span class="router__a">{r.a}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <p class="eyebrow">{c.servicesEyebrow}</p>
+      <h2>{c.servicesH2}</h2>
+      <div class="svc-groups">
+        {groupKeys.map((g) => (
+          <div class="svc-group">
+            <h3>{GROUPS[g][lang]}</h3>
+            <ul>
+              {SERVICES.filter((s) => s.group === g).map((s) => (
+                <li>
+                  <a href={L(`/services/${s.slug}`)}>{s[lang].title}</a>
+                  <span>{s[lang].alsoCalled}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  {guides.length > 0 && (
+    <section class="section section--paper2">
+      <div class="wrap">
+        <p class="eyebrow">{c.guidesEyebrow}</p>
+        <h2>{c.guidesH2}</h2>
+        <p class="lede" style="max-width: 62ch">{c.guidesSub}</p>
+        <div class="grid grid--3">
+          {guides.slice(0, 6).map((g) => (
+            <a class="card card--link" href={L(`/guides/${g.data.key}`)}>
+              <h3>{g.data.title}</h3>
+              <p class="small">{g.data.answers}</p>
+              <span class="tag">{g.data.readingTime} {ui.labels.readingTime}</span>
+            </a>
+          ))}
+        </div>
+        <p style="margin-top: var(--s-5)"><a href={L('/guides')}>{ui.cta.allGuides} &rarr;</a></p>
+      </div>
+    </section>
+  )}
+
+  <section class="section section--green">
+    <div class="wrap calc-band">
+      <div>
+        <h2>{c.calcH2}</h2>
+        <p>{c.calcSub}</p>
+      </div>
+      <a class="btn btn--brass" href={L('/stamp-duty-calculator')}>{c.calcCta}</a>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <p class="eyebrow">{c.processEyebrow}</p>
+      <h2>{c.processH2}</h2>
+      <ol class="steps" style="max-width: 62ch">
+        {c.process.map((p) => (
+          <li>
+            <h3>{p.h}</h3>
+            <p>{p.p}</p>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <section class="section section--paper2">
+    <div class="wrap home-bottom">
+      <div>
+        <h2 style="margin-top:0">{c.chamberH2}</h2>
+        <p>
+          {hi ? ch.line1Hi : ch.line1}<br />
+          {hi ? ch.cityHi : ch.city}, {hi ? ch.stateHi : ch.state} {ch.pincode}
+        </p>
+        <p>
+          <a href={`tel:${SITE.phone}`}>{SITE.phoneDisplay}</a><br />
+          <a href={`mailto:${SITE.email}`}>{SITE.email}</a>
+        </p>
+        <Faq lang={lang} items={[...c.faq]} />
+      </div>
+      <div>
+        <EnquiryForm lang={lang} />
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .hero {
+    background: linear-gradient(180deg, var(--paper) 0%, var(--paper-2) 100%);
+    border-bottom: 1px solid var(--line);
+    padding-block: clamp(var(--s-7), 7vw, var(--s-9));
+  }
+  .hero__inner { display: grid; gap: var(--s-7); align-items: start; }
+  @media (min-width: 900px) { .hero__inner { grid-template-columns: 1.55fr 1fr; gap: var(--s-8); } }
+  .hero h1 { margin-bottom: var(--s-4); }
+  .hero .lede { max-width: 56ch; margin-bottom: var(--s-6); }
+
+  .trust {
+    display: grid;
+    gap: var(--s-4);
+    margin: var(--s-7) 0 0;
+    padding-top: var(--s-5);
+    border-top: 1px solid var(--line);
+  }
+  @media (min-width: 600px) { .trust { grid-template-columns: repeat(3, 1fr); gap: var(--s-5); } }
+  .trust div { margin: 0; }
+  .trust dt {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--brass-600);
+    margin-bottom: 4px;
+  }
+  :global([lang='hi']) .trust dt { letter-spacing: 0.02em; text-transform: none; font-size: 0.82rem; }
+  .trust dd { margin: 0; font-size: 0.9rem; color: var(--ink-2); }
+
+  .hero__card {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-top: 3px solid var(--green-800);
+    border-radius: var(--radius);
+    padding: var(--s-6);
+    box-shadow: var(--shadow);
+  }
+  .hero__names { display: grid; gap: var(--s-3); margin: var(--s-4) 0 0; }
+  .hero__names span { display: block; }
+  .hero__names strong {
+    display: block;
+    font-family: var(--font-display);
+    font-size: 1.14rem;
+    color: var(--green-900);
+  }
+  .hero__names em { font-style: normal; font-size: 0.84rem; color: var(--brass-600); }
+  .hero__card hr { margin: var(--s-5) 0; }
+  .hero__addr { font-size: 0.92rem; color: var(--ink-2); margin-bottom: var(--s-2); }
+  .hero__hours { font-size: 0.84rem; color: var(--ink-3); margin: 0; }
+
+  .router { list-style: none; padding: 0; margin: var(--s-6) 0 0; display: grid; gap: 0; border-top: 1px solid var(--line); }
+  @media (min-width: 760px) { .router { grid-template-columns: 1fr 1fr; column-gap: var(--s-6); } }
+  .router li { margin: 0; border-bottom: 1px solid var(--line); }
+  .router a {
+    display: block;
+    padding: var(--s-4) var(--s-6) var(--s-4) 0;
+    text-decoration: none;
+    position: relative;
+  }
+  .router a::after {
+    content: '';
+    position: absolute;
+    right: 8px; top: 50%;
+    width: 8px; height: 8px;
+    border-right: 1.5px solid var(--brass-500);
+    border-top: 1.5px solid var(--brass-500);
+    transform: translateY(-50%) rotate(45deg);
+    transition: transform 0.16s ease;
+  }
+  .router a:hover::after { transform: translateY(-50%) translateX(3px) rotate(45deg); }
+  .router__q {
+    display: block;
+    font-family: var(--font-display);
+    font-size: 1.08rem;
+    font-weight: 600;
+    color: var(--green-900);
+    margin-bottom: 3px;
+  }
+  .router__a { display: block; font-size: 0.9rem; color: var(--ink-2); }
+  .router a:hover .router__q { color: var(--green-600); }
+
+  .svc-groups { display: grid; gap: var(--s-6); margin-top: var(--s-6); }
+  @media (min-width: 800px) { .svc-groups { grid-template-columns: repeat(3, 1fr); gap: var(--s-7); } }
+  .svc-group h3 {
+    margin: 0 0 var(--s-4);
+    padding-bottom: var(--s-3);
+    border-bottom: 1px solid var(--line);
+    font-size: 1.05rem;
+  }
+  .svc-group ul { list-style: none; padding: 0; margin: 0; }
+  .svc-group li { margin-bottom: var(--s-4); }
+  .svc-group a { font-weight: 500; text-decoration: none; }
+  .svc-group a:hover { text-decoration: underline; }
+  .svc-group span { display: block; font-size: 0.82rem; color: var(--ink-3); margin-top: 2px; }
+
+  .calc-band { display: grid; gap: var(--s-5); align-items: center; }
+  @media (min-width: 800px) { .calc-band { grid-template-columns: 1fr auto; gap: var(--s-7); } }
+  .calc-band h2 { margin-top: 0; }
+  .calc-band p { margin: 0; max-width: 60ch; color: #cfd9d3; }
+
+  .home-bottom { display: grid; gap: var(--s-7); align-items: start; }
+  @media (min-width: 900px) { .home-bottom { grid-template-columns: 1.25fr 1fr; gap: var(--s-8); } }
+</style>

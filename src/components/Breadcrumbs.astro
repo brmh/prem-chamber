@@ -1,0 +1,60 @@
+---
+import type { Lang } from '../data/site';
+import { SITE } from '../data/site';
+import { t } from '../i18n/ui';
+
+export interface Crumb { label: string; href?: string }
+interface Props { lang: Lang; items: Crumb[] }
+const { lang, items } = Astro.props;
+const ui = t(lang);
+const home = lang === 'hi' ? '/hi' : '/';
+const all: Crumb[] = [{ label: ui.nav.home, href: home }, ...items];
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: all.map((c, i) => ({
+    '@type': 'ListItem',
+    position: i + 1,
+    name: c.label,
+    ...(c.href ? { item: new URL(c.href, SITE.origin).href } : {}),
+  })),
+};
+---
+
+<nav aria-label={ui.labels.breadcrumb} class="crumbs">
+  <ol>
+    {all.map((c, i) => (
+      <li>
+        {c.href && i < all.length - 1 ? <a href={c.href}>{c.label}</a> : <span aria-current="page">{c.label}</span>}
+      </li>
+    ))}
+  </ol>
+</nav>
+<script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+
+<style>
+  .crumbs { margin-bottom: var(--s-5); }
+  .crumbs ol {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 10px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    font-size: 0.82rem;
+    color: var(--ink-3);
+  }
+  .crumbs li { margin: 0; display: flex; align-items: center; gap: 10px; }
+  .crumbs li + li::before {
+    content: '';
+    width: 5px; height: 5px;
+    border-right: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    transform: rotate(-45deg);
+  }
+  .crumbs a { color: var(--ink-3); text-decoration: none; }
+  .crumbs a:hover { color: var(--green-700); text-decoration: underline; }
+  .crumbs [aria-current='page'] { color: var(--ink-2); }
+</style>

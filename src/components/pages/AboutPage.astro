@@ -1,0 +1,144 @@
+---
+import type { Lang } from '../../data/site';
+import { SITE, localePath } from '../../data/site';
+import { t } from '../../i18n/ui';
+import { SERVICES } from '../../data/services/index';
+import Base from '../../layouts/Base.astro';
+import Breadcrumbs from '../Breadcrumbs.astro';
+import Seal from '../Seal.astro';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const ui = t(lang);
+const L = (p: string) => localePath(lang, p);
+const hi = lang === 'hi';
+const ch = SITE.chamber;
+const bc = SITE.barCouncil;
+
+const title = hi
+  ? 'परिचय — प्रेम चैम्बर, अधिवक्ता, तहसील कम्पाउंड गाज़ियाबाद'
+  : 'About — Prem Chamber, Advocates, Tehsil Compound Ghaziabad';
+const description = hi
+  ? 'प्रेम चैम्बर के बारे में — गाज़ियाबाद तहसील कम्पाउंड में स्थित चैम्बर, जहाँ प्रेमपाल शर्मा और अंकित भारद्वाज (अधिवक्ता एवं ओथ कमिश्नर) प्रैक्टिस करते हैं।'
+  : 'About Prem Chamber — a chamber in the Tehsil Compound at Ghaziabad where Prempal Sharma and Ankit Bhardwaj, Advocate and Oath Commissioner, practise.';
+---
+
+<Base lang={lang} path="/about" title={title} description={description}>
+  <div class="section section--tight">
+    <div class="wrap">
+      <Breadcrumbs lang={lang} items={[{ label: ui.nav.about }]} />
+
+      <div class="about-grid">
+        <div class="prose">
+          <h1>{hi ? 'चैम्बर के बारे में' : 'About the chamber'}</h1>
+
+          <p class="lede">
+            {hi
+              ? 'प्रेम चैम्बर गाज़ियाबाद के तहसील कम्पाउंड में है — ठीक वहाँ जहाँ रजिस्ट्री, शपथ पत्र और राजस्व से जुड़े काम होते हैं। प्रैक्टिस का बड़ा हिस्सा वही है: दस्तावेज़ तैयार कराना, संपत्ति के कागज़ पढ़ना, और लोगों को कार्यालयों के आर-पार ले जाना।'
+              : 'Prem Chamber sits inside the Tehsil Compound at Ghaziabad, which is where registry, affidavit and revenue work actually happens. Most of the practice follows from that: drafting documents, reading property papers, and taking people through the offices.'}
+          </p>
+
+          <h2>{hi ? 'काम करने का तरीक़ा' : 'How the chamber works'}</h2>
+          <p>
+            {hi
+              ? 'यहाँ आने वाले ज़्यादातर लोग वकील नहीं ढूँढ़ रहे होते। वे एक काम निपटाना चाहते हैं — रजिस्ट्री, मैरिज सर्टिफ़िकेट, शपथ पत्र — और वे यह जानना चाहते हैं कि लगेगा कितना, समय कितना, और कहीं कुछ ग़लत तो नहीं हो रहा।'
+              : 'Most people who come here are not looking for a lawyer. They have one job to finish — a registry, a marriage certificate, an affidavit — and they want to know what it will cost, how long it will take, and whether anything is going wrong.'}
+          </p>
+          <p>
+            {hi
+              ? 'इसलिए यहाँ काम शुरू होने से पहले बताया जाता है कि क्या होगा और कितना खर्च आएगा, और अगर कोई काम नहीं होना चाहिए तो वह भी साफ़ कह दिया जाता है। संपत्ति के मामलों में इसका मतलब अक्सर यह होता है कि कागज़ पढ़कर सौदे से रुकने की सलाह दी जाए।'
+              : 'So the position is stated before the work starts, including what it will cost — and where something should not be done at all, that is said plainly too. In property matters that often means reading the papers and advising against the deal.'}
+          </p>
+
+          <h2>{hi ? 'भाषा' : 'Language'}</h2>
+          <p>
+            {hi
+              ? 'दस्तावेज़ हिंदी या अंग्रेज़ी, जिस भाषा में कार्यालय माँगे, उसमें तैयार होते हैं। समझाया आपकी भाषा में जाता है। यह वेबसाइट भी इसीलिए दोनों भाषाओं में है।'
+              : 'Documents are drafted in Hindi or English, whichever the office requires. The explanation is given in whichever language you prefer. That is also why this site exists in both.'}
+          </p>
+
+          <h2>{hi ? 'ओथ कमिश्नर' : 'Oath Commissioner'}</h2>
+          <p>
+            {hi
+              ? 'अंकित भारद्वाज ओथ कमिश्नर भी हैं, इसलिए शपथ पत्र चैम्बर में ही तैयार होकर उसी समय अटेस्ट हो जाते हैं — किसी दूसरे काउंटर पर जाने की ज़रूरत नहीं पड़ती।'
+              : 'Ankit Bhardwaj is also an Oath Commissioner, so affidavits are drafted and attested at the chamber itself, without a second trip to another counter.'}
+          </p>
+
+          <h2>{hi ? 'नियमों के बारे में' : 'About the rules'}</h2>
+          <p>
+            {hi
+              ? 'बार काउंसिल ऑफ़ इंडिया के नियमों के अनुसार अधिवक्ता अपने काम का प्रचार नहीं कर सकते। इसलिए इस साइट पर न कोई दावा है, न रेटिंग, न ग्राहकों की टिप्पणियाँ। यहाँ केवल यह लिखा है कि चैम्बर में कौन-सा काम होता है और वह काम होता कैसे है।'
+              : 'Under the rules of the Bar Council of India an advocate may not advertise. So there are no claims, ratings or client testimonials anywhere on this site. It sets out what work the chamber does and how that work is done, and nothing more.'}
+          </p>
+        </div>
+
+        <aside class="about-card">
+          <Seal size={48} />
+          <h2>{hi ? 'चैम्बर' : 'The chamber'}</h2>
+          <dl>
+            {SITE.advocates.map((a) => (
+              <div>
+                <dt>{hi ? a.nameHi : a.name}</dt>
+                <dd>{hi ? a.roleHi : a.role}</dd>
+              </div>
+            ))}
+          </dl>
+          <hr />
+          <p class="about-addr">
+            {hi ? ch.line1Hi : ch.line1}<br />
+            {hi ? ch.cityHi : ch.city}, {hi ? ch.stateHi : ch.state} {ch.pincode}
+          </p>
+          <p>
+            <a href={`tel:${SITE.phone}`}>{SITE.phoneDisplay}</a><br />
+            <a href={`mailto:${SITE.email}`}>{SITE.email}</a>
+          </p>
+          {bc.enrolmentNo && (
+            <p class="about-enrol">
+              {hi ? bc.councilHi : bc.council}<br />
+              {ui.footer.enrolment}: {bc.enrolmentNo}
+              {bc.practisingSince && <><br />{hi ? 'नामांकन वर्ष' : 'Enrolled'}: {bc.practisingSince}</>}
+            </p>
+          )}
+          <a class="btn btn--primary about-btn" href={L('/contact')}>{ui.cta.appointment}</a>
+        </aside>
+      </div>
+
+      <section class="about-practice">
+        <h2>{hi ? 'कार्यक्षेत्र' : 'Practice areas'}</h2>
+        <ul>
+          {SERVICES.map((s) => <li><a href={L(`/services/${s.slug}`)}>{s[lang].title}</a></li>)}
+        </ul>
+      </section>
+    </div>
+  </div>
+</Base>
+
+<style>
+  .about-grid { display: grid; gap: var(--s-7); align-items: start; }
+  @media (min-width: 900px) { .about-grid { grid-template-columns: minmax(0, 1fr) 300px; gap: var(--s-8); } }
+
+  .about-card {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-top: 3px solid var(--green-800);
+    border-radius: var(--radius);
+    padding: var(--s-5);
+    font-size: 0.93rem;
+  }
+  .about-card h2 { margin: var(--s-4) 0 var(--s-4); font-size: 1.05rem; }
+  .about-card dl { margin: 0; display: grid; gap: var(--s-3); }
+  .about-card dt { font-family: var(--font-display); font-size: 1.08rem; color: var(--green-900); font-weight: 600; }
+  .about-card dd { margin: 0; font-size: 0.83rem; color: var(--brass-600); }
+  .about-addr { color: var(--ink-2); }
+  .about-enrol { font-size: 0.84rem; color: var(--ink-3); }
+  .about-btn { width: 100%; margin-top: var(--s-2); }
+
+  .about-practice { margin-top: var(--s-8); padding-top: var(--s-6); border-top: 1px solid var(--line); }
+  .about-practice ul {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    gap: var(--s-3);
+  }
+  @media (min-width: 700px) { .about-practice ul { grid-template-columns: repeat(3, 1fr); } }
+</style>

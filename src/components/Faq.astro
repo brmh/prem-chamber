@@ -1,0 +1,43 @@
+---
+import type { Lang } from '../data/site';
+import { t } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+  items: { q: string; a: string }[];
+  heading?: string;
+  /** Set false on pages that already emit a FAQPage block. */
+  schema?: boolean;
+}
+const { lang, items, heading, schema = true } = Astro.props;
+const ui = t(lang);
+if (!items.length) return null;
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: items.map((i) => ({
+    '@type': 'Question',
+    name: i.q,
+    acceptedAnswer: { '@type': 'Answer', text: i.a },
+  })),
+};
+---
+
+<section class="faq-block">
+  <h2>{heading ?? ui.labels.faq}</h2>
+  <div class="faq">
+    {items.map((item, i) => (
+      <details open={i === 0}>
+        <summary>{item.q}</summary>
+        <div class="faq__body"><p>{item.a}</p></div>
+      </details>
+    ))}
+  </div>
+</section>
+{schema && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
+
+<style>
+  .faq-block { margin-top: var(--s-8); }
+  .faq-block h2 { margin-top: 0; }
+</style>

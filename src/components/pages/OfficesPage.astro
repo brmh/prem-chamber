@@ -1,0 +1,161 @@
+---
+import type { Lang } from '../../data/site';
+import { SITE, localePath } from '../../data/site';
+import { t } from '../../i18n/ui';
+import { publishedOffices } from '../../data/offices';
+import Base from '../../layouts/Base.astro';
+import Breadcrumbs from '../Breadcrumbs.astro';
+import Faq from '../Faq.astro';
+import EnquiryForm from '../EnquiryForm.astro';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const ui = t(lang);
+const L = (p: string) => localePath(lang, p);
+const hi = lang === 'hi';
+const offices = publishedOffices();
+
+const title = hi
+  ? 'गाज़ियाबाद सब-रजिस्ट्रार कार्यालय — रजिस्ट्री का दिन | प्रेम चैम्बर'
+  : 'Registry Day at the Ghaziabad Sub-Registrar Office | Prem Chamber';
+const description = hi
+  ? 'गाज़ियाबाद सब-रजिस्ट्रार कार्यालय में रजिस्ट्री के दिन की पूरी प्रक्रिया — क्या साथ ले जाएँ, गवाह कौन हो सकते हैं, बायोमेट्रिक, और दस्तावेज़ वापस कब मिलता है।'
+  : 'What actually happens at the Ghaziabad Sub-Registrar office on the day of registration — what to carry, who can be a witness, biometrics, and when the deed comes back.';
+
+const steps = hi
+  ? [
+      { h: 'पहुँचिए तय समय से पहले', p: 'पोर्टल पर बुक किया गया समय एक खिड़की होती है, तय मिनट नहीं। दोनों पक्षों का साथ पहुँचना ज़रूरी है — एक के देर से आने पर पूरा दिन निकल जाता है।' },
+      { h: 'दस्तावेज़ की जाँच', p: 'ई-स्टाम्प, रजिस्ट्रेशन फ़ीस की रसीद और तैयार दस्तावेज़ प्रस्तुत होते हैं। विवरण में कोई भी अंतर यहीं पकड़ा जाता है।' },
+      { h: 'फ़ोटो और बायोमेट्रिक', p: 'दोनों पक्षों और गवाहों की फ़ोटो और अँगूठे के निशान लिए जाते हैं। यही वह हिस्सा है जिसके लिए सबका शारीरिक रूप से मौजूद होना अनिवार्य है।' },
+      { h: 'स्वीकृति और पृष्ठांकन', p: 'सब-रजिस्ट्रार के समक्ष दस्तावेज़ स्वीकार किया जाता है और उस पर पृष्ठांकन होता है। यही वह क्षण है जिस पर रजिस्ट्री पूरी मानी जाती है।' },
+      { h: 'दस्तावेज़ वापस मिलना', p: 'स्कैनिंग के बाद मूल दस्तावेज़ वापस मिलता है — कहीं उसी दिन, कहीं कुछ दिन बाद। रसीद सँभालकर रखिए, वही उसे लेने का आधार है।' },
+      { h: 'दाखिल-खारिज', p: 'रजिस्ट्री यहीं ख़त्म नहीं होती। राजस्व या प्राधिकरण के रिकॉर्ड में नाम चढ़वाने के लिए अलग आवेदन करना होता है।' },
+    ]
+  : [
+      { h: 'Reach before the slot', p: 'The time booked on the portal is a window, not an exact minute. Both sides have to arrive together, because one person being late loses the whole day.' },
+      { h: 'Documents are checked', p: 'The e-stamp, the registration fee receipt and the engrossed deed are presented. Any mismatch in the details is caught here.' },
+      { h: 'Photographs and biometrics', p: 'Photographs and thumb impressions of both parties and the witnesses are taken. This is the part that makes physical presence unavoidable.' },
+      { h: 'Admission and endorsement', p: 'The deed is admitted before the Sub-Registrar and endorsed. That is the moment the registration is treated as complete.' },
+      { h: 'The deed comes back', p: 'After scanning, the original is returned, sometimes the same day and sometimes after a few days. Keep the receipt; it is what you collect against.' },
+      { h: 'Mutation', p: 'Registration is not the end. A separate application is needed to get your name into the revenue or authority record.' },
+    ];
+
+const faqs = hi
+  ? [
+      { q: 'गवाह कौन बन सकता है?', a: 'कोई भी वयस्क जिसके पास अपना वैध पहचान पत्र हो और जो उपस्थित होकर हस्ताक्षर कर सके। आमतौर पर परिचित या रिश्तेदार होते हैं। गवाह को लेनदेन में हिस्सेदार होने की ज़रूरत नहीं, पर उसका पहचान पत्र और फ़ोटो लगते हैं।' },
+      { q: 'क्या रजिस्ट्री के लिए आधार अनिवार्य है?', a: 'बायोमेट्रिक सत्यापन की व्यवस्था आधार से जुड़ी होती है, इसलिए व्यवहार में सभी पक्ष और गवाह आधार साथ लेकर आते हैं। इसके अलावा पैन, और पैन न होने पर फ़ॉर्म 60 भी लगता है।' },
+      { q: 'पक्ष बीमार है और कार्यालय नहीं आ सकता, तो?', a: 'उपयुक्त मामलों में निर्धारित शुल्क देकर सब-रजिस्ट्रार से निवास पर आने का अनुरोध किया जा सकता है। दूसरा रास्ता रजिस्टर्ड मुख्तारनामा है। बिना इन दोनों के कोई और उनकी ओर से हस्ताक्षर नहीं कर सकता।' },
+    ]
+  : [
+      { q: 'Who can be a witness?', a: 'Any adult with their own valid identity proof who can attend and sign. They are usually people known to the parties. A witness need not have any interest in the transaction, but their identity proof and photograph are taken.' },
+      { q: 'Is Aadhaar compulsory for registration?', a: 'Biometric verification is linked to Aadhaar, so in practice all parties and witnesses bring it. PAN is also required, with Form 60 where a party does not have one.' },
+      { q: 'A party is unwell and cannot come to the office. What then?', a: 'In appropriate cases the Sub-Registrar can be requested to attend at the residence on payment of the prescribed fee. The other route is a registered power of attorney. Without one of these, nobody else can sign on their behalf.' },
+    ];
+---
+
+<Base lang={lang} path="/sub-registrar-offices" title={title} description={description}>
+  <div class="section section--tight">
+    <div class="wrap">
+      <Breadcrumbs lang={lang} items={[{ label: ui.nav.offices }]} />
+      <h1>{hi ? 'रजिस्ट्री के दिन क्या होता है' : 'What happens on the day of registration'}</h1>
+      <p class="lede" style="max-width:62ch">
+        {hi
+          ? 'ज़्यादातर लोग सब-रजिस्ट्रार कार्यालय ज़िंदगी में एक-दो बार ही जाते हैं, और तब भी यह नहीं पता होता कि होगा क्या। नीचे पूरा क्रम दिया है, और वह भी जो लोग भूल जाते हैं।'
+          : 'Most people go to a Sub-Registrar office once or twice in their life, and usually without knowing what is about to happen. Here is the sequence, including the parts people forget.'}
+      </p>
+
+      <div class="offices-grid">
+        <div>
+          <h2>{hi ? 'क्रम' : 'The sequence'}</h2>
+          <ol class="steps">
+            {steps.map((s) => (
+              <li>
+                <h3>{s.h}</h3>
+                <p>{s.p}</p>
+              </li>
+            ))}
+          </ol>
+        </div>
+
+        <aside>
+          <div class="carry">
+            <h2>{hi ? 'साथ क्या ले जाना है' : 'What to carry'}</h2>
+            <ul class="checklist">
+              <li>{hi ? 'ई-स्टाम्प प्रमाण पत्र और रजिस्ट्रेशन फ़ीस की रसीद' : 'E-stamp certificate and registration fee receipt'}</li>
+              <li>{hi ? 'तैयार दस्तावेज़ की प्रतियाँ' : 'Copies of the engrossed deed'}</li>
+              <li>{hi ? 'दोनों पक्षों का आधार और पैन (या फ़ॉर्म 60)' : 'Aadhaar and PAN of both parties, or Form 60'}</li>
+              <li>{hi ? 'दो गवाह, अपने पहचान पत्र के साथ' : 'Two witnesses, with their own identity proof'}</li>
+              <li>{hi ? 'सभी की पासपोर्ट साइज़ फ़ोटो' : 'Passport photographs of everyone'}</li>
+              <li>{hi ? 'पुराने कागज़ों की मूल प्रतियाँ' : 'Originals of the earlier title documents'}</li>
+              <li>{hi ? 'जहाँ लागू हो वहाँ अनापत्ति प्रमाण पत्र' : 'No-dues certificate, where it applies'}</li>
+            </ul>
+          </div>
+        </aside>
+      </div>
+
+      {offices.length > 0 && (
+        <section>
+          <h2>{hi ? 'ज़िले के सब-रजिस्ट्रार कार्यालय' : 'Sub-Registrar offices in the district'}</h2>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>{hi ? 'तहसील' : 'Tehsil'}</th>
+                  <th>{hi ? 'पता' : 'Address'}</th>
+                  <th>{hi ? 'क्षेत्र' : 'Covers'}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {offices.map((o) => (
+                  <tr>
+                    <td>{hi ? o.tehsilHi : o.tehsil}</td>
+                    <td>{hi ? o.addressHi : o.address}</td>
+                    <td>{hi ? o.coversHi : o.covers}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      )}
+
+      <div class="note">
+        <span class="note__label">{hi ? 'सुझाव' : 'One thing worth doing'}</span>
+        <p>
+          {hi
+            ? 'जाने से एक दिन पहले सारे कागज़ एक फ़ाइल में लगाकर एक बार पढ़ लीजिए, और नाम की वर्तनी आधार से मिला लीजिए। कार्यालय में सबसे ज़्यादा दिन नाम या पते की छोटी सी गड़बड़ी की वजह से ख़राब होते हैं।'
+            : 'The day before, put every paper in one file and read the deed once more, checking the spelling of names against Aadhaar. More days are lost at the office to a small mismatch in a name or address than to anything else.'}
+        </p>
+      </div>
+
+      <Faq lang={lang} items={faqs} />
+
+      <p style="margin-top: var(--s-6)">
+        <a href={L('/guides/property-registration-process')}>
+          {hi ? 'रजिस्ट्री की पूरी प्रक्रिया पढ़िए' : 'Read the full registration process'} &rarr;
+        </a>
+      </p>
+    </div>
+  </div>
+
+  <section class="section section--paper2">
+    <div class="wrap" style="max-width:640px">
+      <EnquiryForm lang={lang} />
+    </div>
+  </section>
+</Base>
+
+<style>
+  .offices-grid { display: grid; gap: var(--s-7); align-items: start; margin-top: var(--s-6); }
+  @media (min-width: 900px) { .offices-grid { grid-template-columns: 1.4fr 1fr; gap: var(--s-8); } }
+  .offices-grid h2 { margin-top: 0; }
+  .carry {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-top: 3px solid var(--brass-500);
+    border-radius: var(--radius);
+    padding: var(--s-5);
+  }
+  .carry h2 { font-size: 1.05rem; margin: 0 0 var(--s-4); }
+  .carry li { font-size: 0.9rem; color: var(--ink-2); }
+</style>

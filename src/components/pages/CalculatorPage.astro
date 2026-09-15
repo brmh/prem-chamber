@@ -1,0 +1,252 @@
+---
+import type { Lang } from '../../data/site';
+import { SITE, localePath } from '../../data/site';
+import { t } from '../../i18n/ui';
+import { RATES, AREA_UNITS } from '../../data/rates';
+import Base from '../../layouts/Base.astro';
+import Breadcrumbs from '../Breadcrumbs.astro';
+import Faq from '../Faq.astro';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const ui = t(lang);
+const L = (p: string) => localePath(lang, p);
+const hi = lang === 'hi';
+
+const title = hi
+  ? 'स्टाम्प ड्यूटी कैलकुलेटर — गाज़ियाबाद, उत्तर प्रदेश | प्रेम चैम्बर'
+  : 'Stamp Duty Calculator — Ghaziabad, Uttar Pradesh | Prem Chamber';
+const description = hi
+  ? 'गाज़ियाबाद में रजिस्ट्री का खर्च निकालिए। क्षेत्रफल और सर्किल रेट से स्टाम्प ड्यूटी, महिला क्रेता की छूट और रजिस्ट्रेशन फ़ीस की गणना।'
+  : 'Work out the cost of a registry in Ghaziabad. Stamp duty from area and circle rate, the rebate for women buyers, and the registration fee.';
+
+const faqs = hi
+  ? [
+      { q: 'यह कैलकुलेटर कितना सही है?', a: 'यह उन्हीं नियमों पर चलता है जो सब-रजिस्ट्रार कार्यालय लगाता है — सर्किल रेट मूल्य और तय कीमत में जो ज़्यादा हो उस पर ड्यूटी। असली माँग इस पर भी निर्भर करती है कि संपत्ति की श्रेणी क्या है, निर्माण है या नहीं, और उस समय कौन-सी अधिसूचना लागू है। इसे अंदाज़े के लिए इस्तेमाल कीजिए, अंतिम आँकड़ा मानकर नहीं।' },
+      { q: 'सर्किल रेट कहाँ से पता करूँ?', a: 'ज़िले की सर्किल रेट सूची स्टाम्प एवं रजिस्ट्रेशन विभाग के पोर्टल पर उपलब्ध रहती है, और वह मोहल्ले तथा संपत्ति की श्रेणी के हिसाब से अलग-अलग होती है। सही श्रेणी चुनना ही वह जगह है जहाँ ज़्यादातर गड़बड़ी होती है।' },
+      { q: 'क्या इसमें अधिवक्ता की फ़ीस शामिल है?', a: 'नहीं। यह केवल सरकारी शुल्क दिखाता है — स्टाम्प ड्यूटी और रजिस्ट्रेशन फ़ीस। दस्तावेज़ तैयार कराने और उपस्थिति की फ़ीस अलग होती है और काम शुरू होने से पहले बता दी जाती है।' },
+    ]
+  : [
+      { q: 'How accurate is this calculator?', a: 'It applies the same rule the Sub-Registrar office applies: duty on the higher of the circle rate value and the consideration. The actual demand also depends on the category of property, whether there is construction, and the notification in force on the day. Use it as an estimate, not as a final figure.' },
+      { q: 'Where do I find the circle rate?', a: 'The district circle rate list is published on the Stamp and Registration department portal, and it varies by locality and by category of property. Choosing the right category is where most estimates go wrong.' },
+      { q: 'Does this include the advocate’s fee?', a: 'No. It shows government charges only, that is stamp duty and the registration fee. The fee for drafting and appearance is separate, and is told to you before the work starts.' },
+    ];
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebApplication',
+    name: title,
+    applicationCategory: 'FinanceApplication',
+    operatingSystem: 'Web',
+    offers: { '@type': 'Offer', price: '0', priceCurrency: 'INR' },
+  },
+];
+---
+
+<Base lang={lang} path="/stamp-duty-calculator" title={title} description={description} jsonLd={jsonLd}>
+  <div class="section section--tight">
+    <div class="wrap">
+      <Breadcrumbs lang={lang} items={[{ label: ui.nav.calculator }]} />
+      <h1>{hi ? 'स्टाम्प ड्यूटी और रजिस्ट्री कैलकुलेटर' : 'Stamp duty and registry calculator'}</h1>
+      <p class="lede" style="max-width:62ch">
+        {hi
+          ? 'क्षेत्रफल, सर्किल रेट और तय कीमत डालिए। कैलकुलेटर दोनों आधारों पर ड्यूटी निकालकर बताएगा कि कार्यालय किस मूल्य पर शुल्क लेगा।'
+          : 'Enter the area, the circle rate and the price you have agreed. The calculator works out the duty on both bases and shows which value the office will charge on.'}
+      </p>
+
+      <div class="calc" id="calc" data-rates={JSON.stringify(RATES)} data-lang={lang}>
+        <form class="calc__form">
+          <div class="calc__grid">
+            <div class="calc__field calc__field--split">
+              <label for="c-area">{hi ? 'क्षेत्रफल' : 'Area'}</label>
+              <div class="split">
+                <input id="c-area" type="number" min="0" step="any" inputmode="decimal" value="100" />
+                <select id="c-unit" aria-label={hi ? 'इकाई' : 'Unit'}>
+                  {AREA_UNITS.map((u) => <option value={u.sqm}>{hi ? u.hi : u.en}</option>)}
+                </select>
+              </div>
+            </div>
+
+            <div class="calc__field">
+              <label for="c-rate">{hi ? 'सर्किल रेट (प्रति इकाई ₹)' : 'Circle rate (₹ per unit)'}</label>
+              <input id="c-rate" type="number" min="0" step="any" inputmode="decimal" value="30000" />
+            </div>
+
+            <div class="calc__field">
+              <label for="c-price">{hi ? 'तय कीमत (₹)' : 'Price agreed (₹)'}</label>
+              <input id="c-price" type="number" min="0" step="any" inputmode="decimal" value="2700000" />
+            </div>
+          </div>
+
+          <label class="calc__check">
+            <input id="c-woman" type="checkbox" />
+            <span>{hi ? 'क्रेता महिला हैं' : 'The buyer is a woman'}</span>
+          </label>
+        </form>
+
+        <output class="calc__out" for="c-area c-unit c-rate c-price c-woman">
+          <table>
+            <tbody>
+              <tr><th scope="row">{hi ? 'सर्किल रेट के हिसाब से मूल्य' : 'Circle rate value'}</th><td id="o-circle">—</td></tr>
+              <tr><th scope="row">{hi ? 'तय कीमत' : 'Price agreed'}</th><td id="o-price">—</td></tr>
+              <tr class="calc__hl"><th scope="row">{hi ? 'ड्यूटी जिस मूल्य पर लगेगी' : 'Value duty is charged on'}</th><td id="o-base">—</td></tr>
+              <tr><th scope="row">{hi ? `स्टाम्प ड्यूटी (${RATES.stampDutyPct}%)` : `Stamp duty (${RATES.stampDutyPct}%)`}</th><td id="o-duty">—</td></tr>
+              <tr id="row-rebate" hidden><th scope="row">{hi ? 'महिला क्रेता छूट' : 'Rebate for woman buyer'}</th><td id="o-rebate">—</td></tr>
+              <tr><th scope="row">{hi ? `रजिस्ट्रेशन फ़ीस (${RATES.registrationPct}%)` : `Registration fee (${RATES.registrationPct}%)`}</th><td id="o-reg">—</td></tr>
+              <tr class="calc__total"><th scope="row">{hi ? 'कुल सरकारी शुल्क' : 'Total government charges'}</th><td id="o-total">—</td></tr>
+            </tbody>
+          </table>
+          <p class="calc__basis" id="o-basis"></p>
+        </output>
+      </div>
+
+      <div class="note note--warn">
+        <span class="note__label">{hi ? 'ध्यान दीजिए' : 'Please note'}</span>
+        <p>
+          {hi
+            ? `यह अनुमान ${RATES.verifiedOn} को जाँची गई दरों पर आधारित है और केवल सामान्य जानकारी के लिए है। संपत्ति की श्रेणी, निर्माण, और उस दिन लागू अधिसूचना से असली माँग बदल सकती है। भुगतान से पहले चैम्बर से या कार्यालय से पक्की गणना करा लीजिए।`
+            : `This estimate uses rates checked on ${RATES.verifiedOn} and is for general guidance only. The category of property, any construction on it, and the notification in force on the day can change the actual demand. Get the figure confirmed at the chamber or at the office before you pay.`}
+        </p>
+      </div>
+
+      <div class="calc-cta">
+        <p>{hi ? 'अपनी संपत्ति का सटीक आँकड़ा चाहिए?' : 'Want the exact figure for your property?'}</p>
+        <div class="btn-row">
+          <a class="btn btn--primary" href={`tel:${SITE.phone}`}>{ui.cta.call} · {SITE.phoneDisplay}</a>
+          <a class="btn btn--ghost" href={L('/guides/stamp-duty-ghaziabad')}>{hi ? 'ड्यूटी कैसे लगती है, पढ़िए' : 'How duty is worked out'}</a>
+        </div>
+      </div>
+
+      <Faq lang={lang} items={faqs} />
+    </div>
+  </div>
+</Base>
+
+<script>
+  const root = document.getElementById('calc');
+  if (root) {
+    const R = JSON.parse(root.dataset.rates!) as {
+      stampDutyPct: number; registrationPct: number; registrationCap: number;
+      womenRebatePct: number; womenRebateUpto: number;
+    };
+    const hi = root.dataset.lang === 'hi';
+    const fmt = new Intl.NumberFormat(hi ? 'hi-IN' : 'en-IN', {
+      style: 'currency', currency: 'INR', maximumFractionDigits: 0,
+    });
+    const $ = (id: string) => document.getElementById(id) as HTMLInputElement | HTMLSelectElement | null;
+    const set = (id: string, v: string) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+    const num = (id: string) => Math.max(0, Number(($(id) as HTMLInputElement)?.value ?? 0) || 0);
+
+    function run() {
+      const sqm = num('c-area') * Number(($('c-unit') as HTMLSelectElement)?.value ?? 1);
+      const circle = sqm * num('c-rate');
+      const price = num('c-price');
+      const base = Math.max(circle, price);
+
+      let duty = (base * R.stampDutyPct) / 100;
+      const eligible = (document.getElementById('c-woman') as HTMLInputElement)?.checked;
+      const rebate = eligible ? (Math.min(base, R.womenRebateUpto) * R.womenRebatePct) / 100 : 0;
+      duty -= rebate;
+
+      const reg = Math.min((base * R.registrationPct) / 100, R.registrationCap);
+
+      set('o-circle', fmt.format(circle));
+      set('o-price', fmt.format(price));
+      set('o-base', fmt.format(base));
+      set('o-duty', fmt.format(duty + rebate));
+      set('o-rebate', '− ' + fmt.format(rebate));
+      set('o-reg', fmt.format(reg));
+      set('o-total', fmt.format(duty + reg));
+
+      const row = document.getElementById('row-rebate');
+      if (row) (row as HTMLElement).hidden = !eligible;
+
+      const onCircle = circle >= price;
+      set(
+        'o-basis',
+        onCircle
+          ? hi
+            ? 'सर्किल रेट आपकी तय कीमत से ज़्यादा है, इसलिए ड्यूटी सर्किल रेट वाले मूल्य पर लगेगी।'
+            : 'The circle rate value is higher than your agreed price, so duty is charged on the circle rate figure.'
+          : hi
+            ? 'आपकी तय कीमत सर्किल रेट से ज़्यादा है, इसलिए ड्यूटी उसी कीमत पर लगेगी।'
+            : 'Your agreed price is higher than the circle rate value, so duty is charged on the price.',
+      );
+    }
+
+    root.addEventListener('input', run);
+    root.addEventListener('change', run);
+    run();
+  }
+</script>
+
+<style>
+  .calc {
+    display: grid;
+    gap: var(--s-6);
+    margin: var(--s-6) 0 var(--s-5);
+    background: #fff;
+    border: 1px solid var(--line);
+    border-top: 3px solid var(--green-800);
+    border-radius: var(--radius);
+    padding: var(--s-6);
+  }
+  @media (min-width: 900px) { .calc { grid-template-columns: 1fr 1fr; gap: var(--s-7); } }
+
+  .calc__grid { display: grid; gap: var(--s-4); }
+  .calc__field label {
+    display: block;
+    font-size: 0.84rem;
+    font-weight: 600;
+    color: var(--green-900);
+    margin-bottom: 6px;
+  }
+  .calc input[type='number'], .calc select {
+    width: 100%;
+    padding: 11px 13px;
+    font-family: inherit;
+    font-size: 1.02rem;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink);
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+  }
+  .calc input:focus, .calc select:focus { outline: 2px solid var(--green-600); outline-offset: 1px; background: #fff; }
+  .split { display: grid; grid-template-columns: 1fr 1.25fr; gap: var(--s-2); }
+
+  .calc__check {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    margin-top: var(--s-3);
+    padding: 11px 2px;
+    min-height: 44px;
+    font-size: 0.92rem;
+    cursor: pointer;
+  }
+  .calc__check input { width: 20px; height: 20px; flex-shrink: 0; accent-color: var(--green-700); }
+
+  .calc__out { display: block; }
+  .calc__out table { border: 1px solid var(--line); border-radius: var(--radius); font-size: 0.93rem; }
+  .calc__out th { background: transparent; text-transform: none; letter-spacing: 0; font-size: 0.9rem; font-weight: 500; color: var(--ink-2); white-space: normal; }
+  .calc__out td { text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; color: var(--green-900); white-space: nowrap; }
+  .calc__hl th, .calc__hl td { background: var(--green-50); }
+  .calc__total th, .calc__total td {
+    background: var(--green-900);
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 650;
+  }
+  .calc__basis { font-size: 0.85rem; color: var(--ink-3); margin: var(--s-3) 0 0; }
+
+  .calc-cta {
+    background: var(--paper-2);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: var(--s-5);
+    margin-top: var(--s-6);
+  }
+  .calc-cta p { font-family: var(--font-display); font-size: 1.14rem; color: var(--green-900); margin-bottom: var(--s-4); }
+</style>

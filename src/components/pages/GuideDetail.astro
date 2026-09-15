@@ -1,0 +1,203 @@
+---
+import { getCollection, render } from 'astro:content';
+import type { CollectionEntry } from 'astro:content';
+import type { Lang } from '../../data/site';
+import { SITE, localePath } from '../../data/site';
+import { t } from '../../i18n/ui';
+import { SERVICES } from '../../data/services/index';
+import Base from '../../layouts/Base.astro';
+import Breadcrumbs from '../Breadcrumbs.astro';
+import Faq from '../Faq.astro';
+import EnquiryForm from '../EnquiryForm.astro';
+
+interface Props { lang: Lang; entry: CollectionEntry<'guides'> }
+const { lang, entry } = Astro.props;
+const ui = t(lang);
+const d = entry.data;
+const L = (p: string) => localePath(lang, p);
+const hi = lang === 'hi';
+
+const { Content, headings } = await render(entry);
+const toc = headings.filter((h) => h.depth === 2);
+
+const all = await getCollection('guides', (g) => g.data.lang === lang);
+const related = d.related
+  .map((key) => all.find((g) => g.data.key === key))
+  .filter((g): g is NonNullable<typeof g> => Boolean(g));
+const services = d.services
+  .map((slug) => SERVICES.find((s) => s.slug === slug))
+  .filter((s): s is NonNullable<typeof s> => Boolean(s));
+
+const url = new URL(L(`/guides/${d.key}`), SITE.origin).href;
+const fmt = (date: Date) =>
+  date.toLocaleDateString(hi ? 'hi-IN' : 'en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: d.title,
+    description: d.description,
+    inLanguage: hi ? 'hi-IN' : 'en-IN',
+    dateModified: d.updated.toISOString(),
+    datePublished: d.updated.toISOString(),
+    mainEntityOfPage: { '@type': 'WebPage', '@id': url },
+    author: { '@type': 'Organization', name: hi ? SITE.brandHi : SITE.brand, '@id': `${SITE.origin}/#chamber` },
+    publisher: { '@id': `${SITE.origin}/#chamber` },
+  },
+];
+---
+
+<Base lang={lang} path={`/guides/${d.key}`} title={d.metaTitle} description={d.description} ogType="article" jsonLd={jsonLd}>
+  <article class="section section--tight">
+    <div class="wrap">
+      <Breadcrumbs lang={lang} items={[{ label: ui.nav.guides, href: L('/guides') }, { label: d.title }]} />
+
+      <div class="guide-layout">
+        <div class="guide-main">
+          <header class="guide-head">
+            <h1>{d.title}</h1>
+            <p class="guide-answers">{d.answers}</p>
+            <p class="guide-meta">
+              {ui.labels.updated} {fmt(d.updated)}
+              <span aria-hidden="true">·</span>
+              {d.readingTime} {ui.labels.readingTime}
+            </p>
+          </header>
+
+          {d.hasRates && (
+            <div class="note note--warn">
+              <span class="note__label">{hi ? 'दरों के बारे में' : 'About the figures'}</span>
+              <p>
+                {ui.labels.ratesNote} {SITE.ratesVerifiedOn}.
+                {' '}
+                {hi
+                  ? 'सरकारी दरें और सीमाएँ अधिसूचना से बदलती रहती हैं। भुगतान से पहले मौजूदा दर पक्की कर लीजिए।'
+                  : 'State rates and ceilings change by notification. Confirm the current figure before you pay.'}
+              </p>
+            </div>
+          )}
+
+          {toc.length > 2 && (
+            <nav class="toc" aria-label={ui.labels.onThisPage}>
+              <h2>{ui.labels.onThisPage}</h2>
+              <ol>
+                {toc.map((h) => <li><a href={`#${h.slug}`}>{h.text}</a></li>)}
+              </ol>
+            </nav>
+          )}
+
+          <div class="prose guide-prose">
+            <Content />
+          </div>
+
+          <Faq lang={lang} items={[...d.faqs]} />
+
+          {d.sources.length > 0 && (
+            <section class="sources">
+              <h2>{ui.labels.sources}</h2>
+              <ul>
+                {d.sources.map((s) => (
+                  <li><a href={s.url} rel="nofollow noopener" target="_blank">{s.label}</a></li>
+                ))}
+              </ul>
+            </section>
+          )}
+        </div>
+
+        <aside class="guide-aside">
+          <div class="aside-card">
+            <h2>{hi ? 'इसी से जुड़ा काम' : 'Work related to this'}</h2>
+            <ul>
+              {services.map((s) => <li><a href={L(`/services/${s.slug}`)}>{s[lang].title}</a></li>)}
+            </ul>
+            <a class="btn btn--primary aside-btn" href={`tel:${SITE.phone}`}>{ui.cta.call}</a>
+            <p class="aside-phone">{SITE.phoneDisplay}</p>
+          </div>
+
+          {related.length > 0 && (
+            <div class="aside-card">
+              <h2>{ui.labels.relatedGuides}</h2>
+              <ul>
+                {related.map((g) => <li><a href={L(`/guides/${g.data.key}`)}>{g.data.title}</a></li>)}
+              </ul>
+            </div>
+          )}
+        </aside>
+      </div>
+    </div>
+  </article>
+
+  <section class="section section--paper2">
+    <div class="wrap" style="max-width:640px">
+      <EnquiryForm lang={lang} />
+    </div>
+  </section>
+</Base>
+
+<style>
+  .guide-layout { display: grid; gap: var(--s-7); align-items: start; }
+  @media (min-width: 1000px) { .guide-layout { grid-template-columns: minmax(0, 1fr) 290px; gap: var(--s-8); } }
+
+  .guide-head { margin-bottom: var(--s-6); }
+  .guide-head h1 { margin-bottom: var(--s-3); }
+  .guide-answers {
+    font-size: clamp(1.04rem, 1rem + 0.3vw, 1.16rem);
+    color: var(--ink-2);
+    border-left: 3px solid var(--brass-500);
+    padding-left: var(--s-4);
+    margin-bottom: var(--s-4);
+  }
+  .guide-meta { font-size: 0.82rem; color: var(--ink-3); display: flex; gap: 8px; flex-wrap: wrap; margin: 0; }
+
+  .toc {
+    background: var(--paper-2);
+    border: 1px solid var(--line-soft);
+    border-radius: var(--radius);
+    padding: var(--s-4) var(--s-5);
+    margin-bottom: var(--s-6);
+  }
+  .toc h2 {
+    margin: 0 0 var(--s-3);
+    font-family: var(--font-body);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--brass-600);
+  }
+  :global([lang='hi']) .toc h2 { letter-spacing: 0.02em; text-transform: none; font-size: 0.84rem; }
+  .toc ol { margin: 0; padding-left: 1.2em; font-size: 0.92rem; }
+  .toc li { margin-bottom: 6px; }
+
+  .guide-prose :global(h2) { scroll-margin-top: 90px; }
+  .guide-prose :global(table) { font-size: 0.9rem; }
+  .guide-prose :global(td:last-child) { font-variant-numeric: tabular-nums; }
+
+  .guide-aside { display: grid; gap: var(--s-5); }
+  @media (min-width: 1000px) { .guide-aside { position: sticky; top: 92px; } }
+  .aside-card {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: var(--s-5);
+  }
+  .aside-card h2 {
+    margin: 0 0 var(--s-3);
+    font-family: var(--font-body);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--brass-600);
+  }
+  :global([lang='hi']) .aside-card h2 { letter-spacing: 0.02em; text-transform: none; font-size: 0.84rem; }
+  .aside-card ul { list-style: none; padding: 0; margin: 0; font-size: 0.92rem; }
+  .aside-card li { margin-bottom: 9px; }
+  .aside-btn { width: 100%; margin-top: var(--s-4); }
+  .aside-phone { text-align: center; font-size: 0.85rem; color: var(--ink-3); margin: var(--s-2) 0 0; }
+
+  .sources { margin-top: var(--s-8); padding-top: var(--s-5); border-top: 1px solid var(--line); }
+  .sources h2 { margin-top: 0; font-size: 1.05rem; }
+  .sources ul { font-size: 0.92rem; }
+</style>

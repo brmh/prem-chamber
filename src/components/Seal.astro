@@ -1,0 +1,31 @@
+---
+/** The chamber's mark: scales inside a half wreath, taken from the printed card. */
+interface Props { size?: number; class?: string; tone?: 'light' | 'dark' }
+const { size = 40, class: cls = '', tone = 'dark' } = Astro.props;
+const stroke = tone === 'light' ? '#f2ede1' : '#0f4233';
+---
+
+<svg
+  width={size}
+  height={size}
+  viewBox="0 0 64 64"
+  fill="none"
+  stroke={stroke}
+  stroke-width="1.6"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  class={cls}
+  aria-hidden="true"
+  focusable="false"
+>
+  <!-- wreath -->
+  <path d="M18 54c-8-5-12-14-12-23C6 20 11 11 19 6" opacity=".55" />
+  <path d="M46 54c8-5 12-14 12-23C58 20 53 11 45 6" opacity=".55" />
+  <path d="M13 41c3 .4 5-1 6-4M12 33c3 0 5-1.5 5.5-4.5M14 25c2.8.8 5 0 6.5-2.5" opacity=".45" />
+  <path d="M51 41c-3 .4-5-1-6-4M52 33c-3 0-5-1.5-5.5-4.5M50 25c-2.8.8-5 0-6.5-2.5" opacity=".45" />
+  <!-- beam and post -->
+  <path d="M32 16v34M20 22h24M26 50h12" />
+  <!-- pans -->
+  <path d="M20 22l-6 12h12l-6-12ZM44 22l-6 12h12l-6-12Z" />
+  <circle cx="32" cy="14" r="2.4" />
+</svg>

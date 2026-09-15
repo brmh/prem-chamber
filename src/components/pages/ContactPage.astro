@@ -1,0 +1,140 @@
+---
+import type { Lang } from '../../data/site';
+import { SITE, localePath } from '../../data/site';
+import { t } from '../../i18n/ui';
+import Base from '../../layouts/Base.astro';
+import Breadcrumbs from '../Breadcrumbs.astro';
+import EnquiryForm from '../EnquiryForm.astro';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const ui = t(lang);
+const hi = lang === 'hi';
+const ch = SITE.chamber;
+const L = (p: string) => localePath(lang, p);
+
+const title = hi
+  ? 'संपर्क — प्रेम चैम्बर, तहसील कम्पाउंड गाज़ियाबाद | फ़ोन और व्हाट्सएप'
+  : 'Contact — Prem Chamber, Tehsil Compound Ghaziabad | Phone & WhatsApp';
+const description = hi
+  ? 'प्रेम चैम्बर से संपर्क करें — चैम्बर नं. 15, तहसील कम्पाउंड, गाज़ियाबाद। फ़ोन, व्हाट्सएप, ईमेल और चैम्बर का समय।'
+  : 'Contact Prem Chamber — Chamber No. 15, Tehsil Compound, Ghaziabad. Phone, WhatsApp, email and chamber hours.';
+
+const waText = hi ? 'नमस्ते, मुझे अपने मामले में सलाह चाहिए।' : 'Hello, I would like to ask about a matter.';
+const waHref = `https://wa.me/${SITE.whatsapp}?text=${encodeURIComponent(waText)}`;
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'ContactPage',
+    name: title,
+    mainEntity: { '@id': `${SITE.origin}/#chamber` },
+  },
+];
+---
+
+<Base lang={lang} path="/contact" title={title} description={description} jsonLd={jsonLd}>
+  <div class="section section--tight">
+    <div class="wrap">
+      <Breadcrumbs lang={lang} items={[{ label: ui.nav.contact }]} />
+      <h1>{hi ? 'संपर्क' : 'Contact'}</h1>
+      <p class="lede" style="max-width:60ch">
+        {hi
+          ? 'शपथ पत्र या साधारण अटेस्टेशन के लिए कार्य समय में सीधे चैम्बर आ सकते हैं। संपत्ति या विवाह से जुड़े मामलों में पहले फ़ोन कर लीजिए, ताकि सही कागज़ साथ आएँ।'
+          : 'For an affidavit or a simple attestation you can come to the chamber during working hours. For property or marriage matters, call first so that the right papers come with you.'}
+      </p>
+
+      <div class="contact-grid">
+        <div class="contact-details">
+          <div class="cbox">
+            <h2>{ui.labels.chamber}</h2>
+            <address>
+              {hi ? ch.line1Hi : ch.line1}<br />
+              {hi ? ch.cityHi : ch.city}, {hi ? ch.stateHi : ch.state} {ch.pincode}
+            </address>
+            {ch.mapsUrl && (
+              <p><a href={ch.mapsUrl} rel="noopener" target="_blank">{hi ? 'गूगल मैप पर देखिए' : 'Open in Google Maps'} &rarr;</a></p>
+            )}
+          </div>
+
+          <div class="cbox">
+            <h2>{hi ? 'सीधे बात कीजिए' : 'Reach the chamber'}</h2>
+            <p class="cbig"><a href={`tel:${SITE.phone}`}>{SITE.phoneDisplay}</a></p>
+            <div class="btn-row">
+              <a class="btn btn--primary" href={`tel:${SITE.phone}`}>{ui.cta.callShort}</a>
+              <a class="btn btn--ghost" href={waHref} rel="noopener" target="_blank">{ui.cta.whatsapp}</a>
+            </div>
+            <p style="margin-top: var(--s-4)"><a href={`mailto:${SITE.email}`}>{SITE.email}</a></p>
+          </div>
+
+          <div class="cbox">
+            <h2>{ui.labels.hours}</h2>
+            <table class="hours">
+              <tbody>
+                <tr><th scope="row">{hi ? 'सोमवार – शुक्रवार' : 'Monday – Friday'}</th><td>{SITE.hours.weekdays}</td></tr>
+                <tr><th scope="row">{hi ? 'शनिवार' : 'Saturday'}</th><td>{SITE.hours.saturday}</td></tr>
+                <tr><th scope="row">{hi ? 'रविवार' : 'Sunday'}</th><td>{hi ? 'बंद' : SITE.hours.sunday}</td></tr>
+              </tbody>
+            </table>
+            <p class="small" style="margin-top: var(--s-3)">
+              {hi
+                ? 'अदालत के दिनों में चैम्बर में मौजूदगी बदल सकती है। आने से पहले एक कॉल कर लेना बेहतर रहता है।'
+                : 'On court days the chamber may be attended at different times. A call before you set out saves a wasted trip.'}
+            </p>
+          </div>
+
+          <div class="cbox cbox--tip">
+            <h2>{hi ? 'पहली बार आ रहे हैं?' : 'Coming for the first time?'}</h2>
+            <p>
+              {hi
+                ? 'चैम्बर तहसील कम्पाउंड के अंदर है। अगर पहली बार आ रहे हैं तो गेट से फ़ोन कर लीजिए — रास्ता बता दिया जाएगा। जो कागज़ मामले से जुड़े हैं, वे साथ लाइए, फ़ोटोकॉपी नहीं, मूल।'
+                : 'The chamber is inside the Tehsil Compound. If it is your first visit, call from the gate and you will be directed. Bring the papers connected to the matter — the originals, not photocopies.'}
+            </p>
+          </div>
+        </div>
+
+        <div>
+          <EnquiryForm lang={lang} />
+          <p class="small" style="margin-top: var(--s-4)">
+            {hi
+              ? 'यह फ़ॉर्म आपकी जानकारी कहीं सेव नहीं करता। यह सिर्फ़ आपके व्हाट्सएप में एक तैयार संदेश खोल देता है, जिसे भेजना या न भेजना आपके हाथ में है।'
+              : 'This form stores nothing. It only opens WhatsApp on your own phone with the message written out, and whether you send it is up to you.'}
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</Base>
+
+<style>
+  .contact-grid { display: grid; gap: var(--s-7); align-items: start; margin-top: var(--s-6); }
+  @media (min-width: 900px) { .contact-grid { grid-template-columns: 1fr 1fr; gap: var(--s-8); } }
+
+  .contact-details { display: grid; gap: var(--s-5); }
+  .cbox {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: var(--s-5);
+  }
+  .cbox h2 {
+    margin: 0 0 var(--s-3);
+    font-family: var(--font-body);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--brass-600);
+  }
+  :global([lang='hi']) .cbox h2 { letter-spacing: 0.02em; text-transform: none; font-size: 0.84rem; }
+  .cbox address { font-style: normal; font-size: 1.02rem; color: var(--ink); }
+  .cbig { font-family: var(--font-display); font-size: 1.5rem; margin-bottom: var(--s-4); }
+  .cbig a { text-decoration: none; }
+  .cbox--tip { background: var(--paper-2); border-color: var(--line); }
+  .cbox--tip p { margin: 0; font-size: 0.93rem; color: var(--ink-2); }
+
+  .hours { font-size: 0.94rem; border: 0; background: transparent; }
+  .hours th { background: transparent; text-transform: none; letter-spacing: 0; font-weight: 500; font-size: 0.94rem; color: var(--ink-2); padding-left: 0; }
+  .hours td { text-align: right; padding-right: 0; font-variant-numeric: tabular-nums; }
+  .hours tr:last-child th, .hours tr:last-child td { border-bottom: 0; }
+</style>

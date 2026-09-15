@@ -1,0 +1,180 @@
+---
+import type { Lang } from '../data/site';
+import { SITE, localePath } from '../data/site';
+import { t } from '../i18n/ui';
+import Seal from './Seal.astro';
+
+interface Props { lang: Lang; path: string }
+const { lang, path } = Astro.props;
+const ui = t(lang);
+const L = (p: string) => localePath(lang, p);
+
+const nav = [
+  { href: L('/services'), label: ui.nav.services },
+  { href: L('/guides'), label: ui.nav.guides },
+  { href: L('/stamp-duty-calculator'), label: ui.nav.calculator },
+  { href: L('/sub-registrar-offices'), label: ui.nav.offices },
+  { href: L('/about'), label: ui.nav.about },
+];
+
+const altHref = lang === 'en' ? localePath('hi', path) : localePath('en', path);
+const isActive = (href: string) => path !== '/' && href.endsWith(path.split('/').slice(0, 2).join('/'));
+---
+
+<header class="site-head">
+  <div class="wrap head-inner">
+    <a class="brand" href={L('/')}>
+      <Seal size={38} />
+      <span class="brand__text">
+        <strong>{lang === 'hi' ? SITE.brandHi : SITE.brand}</strong>
+        <span>{lang === 'hi' ? 'अधिवक्ता · गाज़ियाबाद' : 'Advocates · Ghaziabad'}</span>
+      </span>
+    </a>
+
+    <nav class="nav" aria-label={ui.nav.menu}>
+      <ul id="site-nav">
+        {nav.map((n) => (
+          <li><a href={n.href} aria-current={isActive(n.href) ? 'page' : undefined}>{n.label}</a></li>
+        ))}
+      </ul>
+    </nav>
+
+    <div class="head-side">
+      <a class="lang" href={altHref} hreflang={lang === 'en' ? 'hi' : 'en'} rel="alternate">
+        {lang === 'en' ? 'हिन्दी' : 'English'}
+      </a>
+      <a class="btn btn--primary btn--sm head-call" href={`tel:${SITE.phone}`}>{ui.cta.callShort}</a>
+      <button class="burger" type="button" aria-expanded="false" aria-controls="site-nav" aria-label={ui.nav.menu}>
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<script>
+  const burger = document.querySelector<HTMLButtonElement>('.burger');
+  const head = document.querySelector<HTMLElement>('.site-head');
+  burger?.addEventListener('click', () => {
+    const open = head?.classList.toggle('is-open') ?? false;
+    burger.setAttribute('aria-expanded', String(open));
+  });
+</script>
+
+<style>
+  .site-head {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    background: rgba(252, 250, 245, 0.94);
+    backdrop-filter: saturate(180%) blur(8px);
+    border-bottom: 1px solid var(--line);
+  }
+  .head-inner {
+    display: flex;
+    align-items: center;
+    gap: var(--s-5);
+    min-height: 68px;
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: var(--s-3);
+    text-decoration: none;
+    min-width: 0;          /* lets the text truncate instead of forcing a wrap */
+    flex: 0 1 auto;
+  }
+  .brand :global(svg) { flex-shrink: 0; }
+  .brand__text { display: flex; flex-direction: column; line-height: 1.15; min-width: 0; }
+  .brand__text strong, .brand__text span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .brand__text strong {
+    font-family: var(--font-display);
+    font-size: 1.16rem;
+    font-weight: 600;
+    color: var(--green-900);
+    letter-spacing: -0.01em;
+  }
+  .brand__text span {
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--brass-600);
+    margin-top: 2px;
+  }
+  :global([lang='hi']) .brand__text span { letter-spacing: 0.02em; text-transform: none; font-size: 0.74rem; }
+
+  .nav { margin-left: auto; }
+  .nav ul { display: flex; gap: var(--s-5); list-style: none; margin: 0; padding: 0; }
+  .nav li { margin: 0; }
+  .nav a {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--ink-2);
+    text-decoration: none;
+    padding-block: 6px;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+  }
+  .nav a:hover, .nav a[aria-current='page'] { color: var(--green-800); border-bottom-color: var(--brass-500); }
+
+  .head-side { display: flex; align-items: center; gap: var(--s-3); flex-shrink: 0; }
+  .lang {
+    font-size: 0.84rem;
+    font-weight: 600;
+    color: var(--green-700);
+    text-decoration: none;
+    padding: 5px 10px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+  }
+  .lang:hover { border-color: var(--green-600); background: var(--green-50); }
+  .btn--sm { padding: 8px 16px; font-size: 0.86rem; }
+
+  .burger {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    width: 42px; height: 38px;
+    padding: 0 9px;
+    background: transparent;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    cursor: pointer;
+  }
+  .burger span { display: block; height: 1.5px; background: var(--green-900); border-radius: 2px; }
+
+  @media (max-width: 1040px) {
+    .nav { order: 4; margin-left: 0; width: 100%; }
+    .nav ul {
+      display: none;
+      flex-direction: column;
+      gap: 0;
+      padding-bottom: var(--s-3);
+      border-top: 1px solid var(--line-soft);
+    }
+    .site-head.is-open .nav ul { display: flex; }
+    .nav li { border-bottom: 1px solid var(--line-soft); }
+    .nav a { display: block; padding: 13px 2px; border-bottom: 0; }
+    .head-inner { flex-wrap: wrap; padding-block: var(--s-3); min-height: 0; }
+    .head-side { margin-left: auto; }
+    .burger { display: flex; }
+  }
+  /* Phones: brand, language and menu stay on one row, and the row stays short. */
+  @media (max-width: 560px) {
+    .head-inner { gap: var(--s-3); padding-block: 10px; }
+    .head-call { display: none; }
+    .head-side { gap: var(--s-2); }
+    .brand { gap: 9px; }
+    .brand :global(svg) { width: 32px; height: 32px; }
+    .brand__text strong { font-size: 1rem; }
+    .brand__text span { font-size: 0.6rem; letter-spacing: 0.07em; }
+    /* 42px keeps these comfortably tappable without making the bar tall. */
+    .lang { padding: 0 11px; font-size: 0.78rem; min-height: 42px; display: grid; place-items: center; }
+    .burger { width: 42px; height: 42px; padding: 0 10px; gap: 4px; }
+  }
+</style>

@@ -1,0 +1,142 @@
+---
+import type { Lang } from '../data/site';
+import { SITE, localePath } from '../data/site';
+import { t } from '../i18n/ui';
+import { SERVICES } from '../data/services/index';
+import Seal from './Seal.astro';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const ui = t(lang);
+const L = (p: string) => localePath(lang, p);
+const hi = lang === 'hi';
+const ch = SITE.chamber;
+const year = new Date().getFullYear();
+---
+
+<footer class="foot">
+  <div class="wrap foot-grid">
+    <div class="foot-col foot-col--brand">
+      <div class="foot-brand">
+        <Seal size={44} tone="light" />
+        <div>
+          <strong>{hi ? SITE.brandHi : SITE.brand}</strong>
+          <span>{hi ? 'तहसील कम्पाउंड, गाज़ियाबाद' : 'Tehsil Compound, Ghaziabad'}</span>
+        </div>
+      </div>
+      <p class="foot-note">{ui.footer.builtNote}</p>
+      <a class="foot-lang" href={hi ? localePath('en', '/') : localePath('hi', '/')}>{ui.footer.langSwitch}</a>
+    </div>
+
+    <div class="foot-col">
+      <h2>{ui.footer.practice}</h2>
+      <ul>
+        {SERVICES.map((s) => (
+          <li><a href={L(`/services/${s.slug}`)}>{s[lang].title}</a></li>
+        ))}
+      </ul>
+    </div>
+
+    <div class="foot-col">
+      <h2>{ui.footer.resources}</h2>
+      <ul>
+        <li><a href={L('/guides')}>{ui.nav.guides}</a></li>
+        <li><a href={L('/stamp-duty-calculator')}>{ui.nav.calculator}</a></li>
+        <li><a href={L('/sub-registrar-offices')}>{ui.nav.offices}</a></li>
+        <li><a href={L('/about')}>{ui.nav.about}</a></li>
+        <li><a href={L('/contact')}>{ui.nav.contact}</a></li>
+      </ul>
+    </div>
+
+    <div class="foot-col">
+      <h2>{ui.footer.chamberHeading}</h2>
+      <address>
+        {hi ? ch.line1Hi : ch.line1}<br />
+        {hi ? ch.cityHi : ch.city}, {hi ? ch.stateHi : ch.state} {ch.pincode}
+      </address>
+      <ul class="foot-contact">
+        <li><a href={`tel:${SITE.phone}`}>{SITE.phoneDisplay}</a></li>
+        <li><a href={`mailto:${SITE.email}`}>{SITE.email}</a></li>
+        <li class="foot-hours">
+          {hi ? 'सोम–शनि' : 'Mon–Sat'} {SITE.hours.weekdays}
+        </li>
+      </ul>
+      {SITE.barCouncil.enrolmentNo && (
+        <p class="foot-enrol">
+          {ui.footer.barCouncil}: {hi ? SITE.barCouncil.councilHi : SITE.barCouncil.council}<br />
+          {ui.footer.enrolment}: {SITE.barCouncil.enrolmentNo}
+        </p>
+      )}
+    </div>
+  </div>
+
+  <div class="wrap foot-legal">
+    <p>{ui.disclaimer.short}</p>
+    <p class="foot-copy">© {year} {hi ? SITE.brandHi : SITE.brand}. {ui.footer.rights}</p>
+  </div>
+</footer>
+
+<style>
+  .foot {
+    background: var(--green-900);
+    color: #cfd9d3;
+    padding-top: var(--s-8);
+    margin-top: var(--s-9);
+    font-size: 0.92rem;
+  }
+  .foot-grid {
+    display: grid;
+    gap: var(--s-7) var(--s-6);
+    grid-template-columns: 1fr;
+    padding-bottom: var(--s-7);
+  }
+  @media (min-width: 680px) { .foot-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 1000px) { .foot-grid { grid-template-columns: 1.4fr 1fr 1fr 1.1fr; } }
+
+  .foot h2 {
+    font-family: var(--font-body);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--brass-300);
+    margin: 0 0 var(--s-4);
+  }
+  :global([lang='hi']) .foot h2 { letter-spacing: 0.03em; text-transform: none; font-size: 0.84rem; }
+
+  .foot ul { list-style: none; margin: 0; padding: 0; }
+  .foot li { margin-bottom: 9px; }
+  .foot a { color: #cfd9d3; text-decoration: none; }
+  .foot a:hover { color: #fff; text-decoration: underline; text-decoration-color: var(--brass-500); }
+
+  .foot-brand { display: flex; gap: var(--s-3); align-items: center; margin-bottom: var(--s-4); }
+  .foot-brand strong {
+    display: block;
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    color: #fff;
+    font-weight: 600;
+  }
+  .foot-brand span { font-size: 0.8rem; color: var(--brass-300); }
+  .foot-note { color: #a9b8b1; max-width: 34ch; margin-bottom: var(--s-4); }
+  .foot-lang {
+    display: inline-block;
+    border: 1px solid rgba(212, 180, 131, 0.4);
+    padding: 6px 14px;
+    border-radius: var(--radius);
+    font-size: 0.85rem;
+  }
+
+  .foot address { font-style: normal; margin-bottom: var(--s-3); color: #cfd9d3; }
+  .foot-hours { color: #a9b8b1; }
+  .foot-enrol { margin-top: var(--s-4); font-size: 0.82rem; color: #a9b8b1; }
+
+  .foot-legal {
+    border-top: 1px solid rgba(255, 255, 255, 0.11);
+    padding-block: var(--s-5) var(--s-6);
+    font-size: 0.8rem;
+    color: #93a39c;
+  }
+  .foot-legal p { margin: 0 0 var(--s-2); max-width: 90ch; }
+  .foot-copy { color: #7d8d86; }
+</style>

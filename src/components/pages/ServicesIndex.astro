@@ -1,0 +1,89 @@
+---
+import type { Lang } from '../../data/site';
+import { localePath } from '../../data/site';
+import { t } from '../../i18n/ui';
+import { SERVICES, GROUPS } from '../../data/services/index';
+import Base from '../../layouts/Base.astro';
+import Breadcrumbs from '../Breadcrumbs.astro';
+import EnquiryForm from '../EnquiryForm.astro';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const ui = t(lang);
+const L = (p: string) => localePath(lang, p);
+const hi = lang === 'hi';
+const groupKeys = ['property', 'family', 'documents'] as const;
+
+const title = hi
+  ? 'सेवाएँ — रजिस्ट्री, वसीयत, विवाह और शपथ पत्र | प्रेम चैम्बर'
+  : 'Services — Registry, Wills, Marriage, Affidavits | Prem Chamber';
+const description = hi
+  ? 'गाज़ियाबाद में बैनामा और रजिस्ट्री, कागज़ों की जाँच, दान पत्र, किरायानामा, वसीयत, मुख्तारनामा, विवाह पंजीकरण, कोर्ट मैरिज और ओथ कमिश्नर द्वारा शपथ पत्र।'
+  : 'Sale deeds and registry, title verification, gift deeds, rent agreements, wills, power of attorney, marriage registration, court marriage and affidavits in Ghaziabad.';
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    itemListElement: SERVICES.map((s, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      name: s[lang].title,
+      url: new URL(L(`/services/${s.slug}`), Astro.site).href,
+    })),
+  },
+];
+---
+
+<Base lang={lang} path="/services" title={title} description={description} jsonLd={jsonLd}>
+  <div class="section section--tight">
+    <div class="wrap">
+      <Breadcrumbs lang={lang} items={[{ label: ui.nav.services }]} />
+      <h1>{hi ? 'चैम्बर में क्या-क्या काम होता है' : 'What the chamber handles'}</h1>
+      <p class="lede" style="max-width:62ch">
+        {hi
+          ? 'हर काम के पेज पर यह लिखा है कि उसमें होता क्या है, कौन-कौन से कागज़ लगते हैं, कितना समय लगता है, और लोग सबसे ज़्यादा क्या पूछते हैं।'
+          : 'Each page below sets out what the work involves, which documents are needed, how long it usually takes, and the questions people ask most often.'}
+      </p>
+    </div>
+  </div>
+
+  {groupKeys.map((g) => (
+    <section class="section section--tight">
+      <div class="wrap">
+        <p class="eyebrow">{GROUPS[g][lang]}</p>
+        <div class="grid grid--2 svc-list">
+          {SERVICES.filter((s) => s.group === g).map((s) => (
+            <a class="card card--link" href={L(`/services/${s.slug}`)}>
+              <h2>{s[lang].title}</h2>
+              <p class="svc-alt">{s[lang].alsoCalled}</p>
+              <p>{s[lang].summary}</p>
+              <span class="svc-more">{ui.cta.viewService} &rarr;</span>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+  ))}
+
+  <section class="section section--paper2">
+    <div class="wrap" style="max-width:640px">
+      <EnquiryForm lang={lang} />
+    </div>
+  </section>
+</Base>
+
+<style>
+  .svc-list { margin-top: var(--s-5); align-items: stretch; }
+  .svc-list .card { display: flex; flex-direction: column; }
+  .svc-list h2 { font-size: 1.22rem; margin: 0 0 4px; }
+  .svc-alt { font-size: 0.8rem; color: var(--brass-600); margin-bottom: var(--s-3); }
+  .svc-list p { font-size: 0.93rem; color: var(--ink-2); }
+  .svc-more {
+    margin-top: auto;
+    padding-top: var(--s-3);
+    font-size: 0.86rem;
+    font-weight: 600;
+    color: var(--green-700);
+  }
+</style>

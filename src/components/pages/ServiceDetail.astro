@@ -1,0 +1,177 @@
+---
+import { getCollection } from 'astro:content';
+import type { Lang } from '../../data/site';
+import { SITE, localePath } from '../../data/site';
+import { t } from '../../i18n/ui';
+import type { Service } from '../../data/services/index';
+import { SERVICES } from '../../data/services/index';
+import Base from '../../layouts/Base.astro';
+import Breadcrumbs from '../Breadcrumbs.astro';
+import Faq from '../Faq.astro';
+import EnquiryForm from '../EnquiryForm.astro';
+
+interface Props { lang: Lang; service: Service }
+const { lang, service } = Astro.props;
+const ui = t(lang);
+const c = service[lang];
+const L = (p: string) => localePath(lang, p);
+const hi = lang === 'hi';
+
+const allGuides = await getCollection('guides', (g) => g.data.lang === lang);
+const guides = service.guides
+  .map((key) => allGuides.find((g) => g.data.key === key))
+  .filter((g): g is NonNullable<typeof g> => Boolean(g));
+
+const others = SERVICES.filter((s) => s.slug !== service.slug && s.group === service.group).slice(0, 3);
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Service',
+    name: c.title,
+    serviceType: c.title,
+    description: c.summary,
+    provider: { '@id': `${SITE.origin}/#chamber` },
+    areaServed: { '@type': 'City', name: hi ? 'गाज़ियाबाद' : 'Ghaziabad' },
+    availableChannel: {
+      '@type': 'ServiceChannel',
+      servicePhone: SITE.phone,
+      serviceUrl: new URL(L(`/services/${service.slug}`), SITE.origin).href,
+    },
+  },
+];
+---
+
+<Base lang={lang} path={`/services/${service.slug}`} title={c.metaTitle} description={c.metaDesc} jsonLd={jsonLd}>
+  <div class="section section--tight">
+    <div class="wrap">
+      <Breadcrumbs lang={lang} items={[{ label: ui.nav.services, href: L('/services') }, { label: c.title }]} />
+
+      <div class="svc-head">
+        <div>
+          <h1>{c.title}</h1>
+          <p class="svc-alt">{hi ? 'यानी' : 'Also called'}: {c.alsoCalled}</p>
+          <div class="problem">
+            <span class="note__label">{hi ? 'स्थिति' : 'The situation'}</span>
+            <p>{c.problem}</p>
+          </div>
+          <p class="lede">{c.summary}</p>
+          <div class="btn-row">
+            <a class="btn btn--primary" href={`tel:${SITE.phone}`}>{ui.cta.call}</a>
+            <a class="btn btn--ghost" href="#enquire">{ui.cta.askQuestion}</a>
+          </div>
+        </div>
+
+        <aside class="svc-aside">
+          <h2>{ui.labels.documents}</h2>
+          <ul class="checklist">
+            {c.documents.map((d) => <li>{d}</li>)}
+          </ul>
+        </aside>
+      </div>
+    </div>
+  </div>
+
+  <section class="section section--paper2 section--tight">
+    <div class="wrap">
+      <div class="svc-cols">
+        <div>
+          <h2 style="margin-top:0">{hi ? 'इसमें क्या-क्या शामिल है' : 'What this covers'}</h2>
+          <ul class="checklist">
+            {c.handles.map((h) => <li>{h}</li>)}
+          </ul>
+        </div>
+        <div>
+          <h2 style="margin-top:0">{ui.labels.process}</h2>
+          <ol class="steps">
+            {c.steps.map((s) => (
+              <li>
+                <h3>{s.h}</h3>
+                <p>{s.p}</p>
+              </li>
+            ))}
+          </ol>
+          <div class="note">
+            <span class="note__label">{hi ? 'कितना समय' : 'How long it takes'}</span>
+            <p>{c.timeline}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap svc-bottom">
+      <div>
+        <Faq lang={lang} items={[...c.faqs]} />
+
+        {guides.length > 0 && (
+          <div class="related">
+            <h2>{ui.labels.relatedGuides}</h2>
+            <ul>
+              {guides.map((g) => (
+                <li>
+                  <a href={L(`/guides/${g.data.key}`)}>{g.data.title}</a>
+                  <span>{g.data.answers}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {others.length > 0 && (
+          <div class="related">
+            <h2>{ui.labels.relatedServices}</h2>
+            <ul>
+              {others.map((s) => (
+                <li><a href={L(`/services/${s.slug}`)}>{s[lang].title}</a></li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </div>
+      <div id="enquire">
+        <EnquiryForm lang={lang} subject={c.title} />
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .svc-head { display: grid; gap: var(--s-6); align-items: start; }
+  @media (min-width: 900px) { .svc-head { grid-template-columns: 1.5fr 1fr; gap: var(--s-8); } }
+  .svc-head h1 { margin-bottom: 4px; }
+  .svc-alt { font-size: 0.85rem; color: var(--brass-600); margin-bottom: var(--s-5); }
+
+  .problem {
+    border-left: 3px solid var(--green-700);
+    background: var(--green-50);
+    padding: var(--s-4) var(--s-5);
+    margin-bottom: var(--s-5);
+    border-radius: 0 var(--radius) var(--radius) 0;
+  }
+  .problem .note__label { color: var(--green-700); }
+  .problem p { margin: 0; color: var(--ink-2); }
+
+  .svc-aside {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: var(--s-5);
+  }
+  .svc-aside h2 { margin: 0 0 var(--s-4); font-size: 1.02rem; }
+  .svc-aside li { font-size: 0.9rem; color: var(--ink-2); }
+
+  .svc-cols { display: grid; gap: var(--s-7); align-items: start; }
+  @media (min-width: 900px) { .svc-cols { grid-template-columns: 1fr 1.25fr; gap: var(--s-8); } }
+
+  .svc-bottom { display: grid; gap: var(--s-7); align-items: start; }
+  @media (min-width: 900px) { .svc-bottom { grid-template-columns: 1.35fr 1fr; gap: var(--s-8); } }
+
+  .related { margin-top: var(--s-7); }
+  .related h2 { font-size: 1.1rem; padding-bottom: var(--s-3); border-bottom: 1px solid var(--line); }
+  .related ul { list-style: none; padding: 0; }
+  .related li { margin-bottom: var(--s-4); }
+  .related a { font-weight: 500; }
+  .related span { display: block; font-size: 0.85rem; color: var(--ink-3); margin-top: 2px; }
+</style>

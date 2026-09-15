@@ -1,0 +1,91 @@
+---
+import { getCollection } from 'astro:content';
+import type { Lang } from '../../data/site';
+import { localePath } from '../../data/site';
+import { t } from '../../i18n/ui';
+import Base from '../../layouts/Base.astro';
+import Breadcrumbs from '../Breadcrumbs.astro';
+import EnquiryForm from '../EnquiryForm.astro';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const ui = t(lang);
+const L = (p: string) => localePath(lang, p);
+const hi = lang === 'hi';
+
+const guides = (await getCollection('guides', (g) => g.data.lang === lang)).sort(
+  (a, b) => a.data.order - b.data.order,
+);
+
+const title = hi
+  ? 'जानकारी — रजिस्ट्री, स्टाम्प ड्यूटी, विवाह, वसीयत | प्रेम चैम्बर'
+  : 'Guides — Registry, Stamp Duty, Marriage & Wills | Prem Chamber';
+const description = hi
+  ? 'गाज़ियाबाद में रजिस्ट्री, सर्किल रेट, स्टाम्प ड्यूटी, विवाह पंजीकरण, कोर्ट मैरिज, वसीयत, मुख्तारनामा और किरायानामा की प्रक्रिया — सीधी और व्यावहारिक भाषा में।'
+  : 'Plain, practical explanations of registry procedure, circle rates, stamp duty, marriage registration, court marriage, wills, power of attorney and rent agreements in Ghaziabad.';
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: title,
+    description,
+    hasPart: guides.map((g) => ({
+      '@type': 'Article',
+      headline: g.data.title,
+      url: new URL(L(`/guides/${g.data.key}`), Astro.site).href,
+    })),
+  },
+];
+---
+
+<Base lang={lang} path="/guides" title={title} description={description} jsonLd={jsonLd}>
+  <div class="section section--tight">
+    <div class="wrap">
+      <Breadcrumbs lang={lang} items={[{ label: ui.nav.guides }]} />
+      <h1>{hi ? 'जानकारी' : 'Guides'}</h1>
+      <p class="lede" style="max-width:64ch">
+        {hi
+          ? 'ये पेज उन्हीं सवालों से बने हैं जो चैम्बर में रोज़ पूछे जाते हैं। मक़सद यह है कि दफ़्तर जाने से पहले आपको पता हो कि होना क्या है, लगेगा कितना, और कहाँ चूक हो सकती है।'
+          : 'These pages are built from the questions actually asked at the chamber. The idea is that you walk into the office already knowing what is supposed to happen, what it should cost, and where things usually go wrong.'}
+      </p>
+
+      <ul class="guide-list">
+        {guides.map((g) => (
+          <li>
+            <a href={L(`/guides/${g.data.key}`)}>
+              <h2>{g.data.title}</h2>
+              <p class="guide-q">{g.data.answers}</p>
+              <p class="guide-desc">{g.data.description}</p>
+              <span class="guide-meta">
+                {g.data.readingTime} {ui.labels.readingTime}
+                <span aria-hidden="true">·</span>
+                {ui.labels.updated} {g.data.updated.toLocaleDateString(hi ? 'hi-IN' : 'en-IN', {
+                  day: 'numeric', month: 'long', year: 'numeric',
+                })}
+              </span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </div>
+
+  <section class="section section--paper2">
+    <div class="wrap" style="max-width:640px">
+      <EnquiryForm lang={lang} />
+    </div>
+  </section>
+</Base>
+
+<style>
+  .guide-list { list-style: none; padding: 0; margin: var(--s-7) 0 0; border-top: 1px solid var(--line); }
+  .guide-list li { margin: 0; border-bottom: 1px solid var(--line); }
+  .guide-list a { display: block; padding: var(--s-5) 0; text-decoration: none; }
+  .guide-list h2 { font-size: 1.28rem; margin: 0 0 4px; }
+  .guide-list a:hover h2 { color: var(--green-600); }
+  .guide-q { font-size: 0.95rem; color: var(--brass-600); margin-bottom: var(--s-2); font-style: italic; }
+  :global([lang='hi']) .guide-q { font-style: normal; }
+  .guide-desc { color: var(--ink-2); font-size: 0.93rem; margin-bottom: var(--s-3); max-width: 72ch; }
+  .guide-meta { font-size: 0.8rem; color: var(--ink-3); display: flex; gap: 8px; flex-wrap: wrap; }
+</style>
