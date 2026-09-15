@@ -6,6 +6,7 @@ import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import StickyBar from '../components/StickyBar.astro';
 import Disclaimer from '../components/Disclaimer.astro';
+import EmblemSprite from '../components/EmblemSprite.astro';
 import '../styles/global.css';
 
 interface Props {
@@ -123,6 +124,7 @@ const fontHref =
   </head>
 
   <body>
+    <EmblemSprite />
     <a class="skip" href="#main">{ui.labels.skip}</a>
     <Header lang={lang} path={langPath ?? path} />
     <main id="main">
