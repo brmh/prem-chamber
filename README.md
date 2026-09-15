@@ -86,6 +86,23 @@ Remove the entry once the position is filled — a stale vacancy is worse than n
 No stipend figure is printed anywhere on that page, deliberately. It varies, and the
 page says it is discussed directly instead.
 
+### Changing the year, the brand or the address
+
+All of it lives in `src/data/site.ts`. The header, hero, footer, About page and the
+structured data read from there, so one edit covers the site.
+
+The share cards are the exception: their text is baked into the PNG as pixels. After
+changing anything that appears on them, regenerate:
+
+```bash
+python3 tools/build-og-cards.py
+npx --yes sharp-cli -i /tmp/og-en.svg -o public/og-en.png --format png
+npx --yes sharp-cli -i /tmp/og-hi.svg -o public/og-hi.png --format png
+```
+
+The script reads every value out of `site.ts` rather than repeating it, so the cards
+cannot drift out of step with the pages.
+
 ### Adding photographs of the chamber
 
 Photographs cannot be pulled from the Google Business Profile — Google publishes no
