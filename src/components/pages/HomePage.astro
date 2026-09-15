@@ -53,12 +53,11 @@ const groupKeys = ['property', 'family', 'documents'] as const;
       <aside class="hero__card">
         <Seal size={54} />
         <p class="hero__names">
-          {SITE.advocates.map((a) => (
-            <span>
-              <strong>{hi ? a.nameHi : a.name}</strong>
-              <em>{hi ? a.roleHi : a.role}</em>
-            </span>
-          ))}
+          <span>
+            <strong>{hi ? SITE.advocate.nameHi : SITE.advocate.name}</strong>
+            <em>{hi ? SITE.advocate.roleHi : SITE.advocate.role}</em>
+            <small>{hi ? SITE.advocate.parentageHi : SITE.advocate.parentage}</small>
+          </span>
         </p>
         <hr />
         <p class="hero__addr">
@@ -223,7 +222,8 @@ const groupKeys = ['property', 'family', 'documents'] as const;
     font-size: 1.14rem;
     color: var(--green-900);
   }
-  .hero__names em { font-style: normal; font-size: 0.84rem; color: var(--brass-600); }
+  .hero__names em { display: block; font-style: normal; font-size: 0.84rem; color: var(--brass-600); }
+  .hero__names small { display: block; margin-top: 5px; font-size: 0.82rem; color: var(--ink-3); }
   .hero__card hr { margin: var(--s-5) 0; }
   .hero__addr { font-size: 0.92rem; color: var(--ink-2); margin-bottom: var(--s-2); }
   .hero__hours { font-size: 0.84rem; color: var(--ink-3); margin: 0; }

@@ -19,8 +19,8 @@ const title = hi
   ? 'परिचय — प्रेम चैम्बर, अधिवक्ता, तहसील कम्पाउंड गाज़ियाबाद'
   : 'About — Prem Chamber, Advocates, Tehsil Compound Ghaziabad';
 const description = hi
-  ? 'प्रेम चैम्बर के बारे में — गाज़ियाबाद तहसील कम्पाउंड में स्थित चैम्बर, जहाँ प्रेमपाल शर्मा और अंकित भारद्वाज (अधिवक्ता एवं ओथ कमिश्नर) प्रैक्टिस करते हैं।'
-  : 'About Prem Chamber — a chamber in the Tehsil Compound at Ghaziabad where Prempal Sharma and Ankit Bhardwaj, Advocate and Oath Commissioner, practise.';
+  ? 'प्रेम चैम्बर के बारे में — गाज़ियाबाद तहसील कम्पाउंड में स्थित चैम्बर, जहाँ अंकित भारद्वाज (अधिवक्ता एवं ओथ कमिश्नर) प्रैक्टिस करते हैं।'
+  : 'About Prem Chamber — a chamber in the Tehsil Compound at Ghaziabad where Ankit Bhardwaj, Advocate and Oath Commissioner, practises.';
 ---
 
 <Base lang={lang} path="/about" title={title} description={description}>
@@ -76,12 +76,11 @@ const description = hi
           <Seal size={48} />
           <h2>{hi ? 'चैम्बर' : 'The chamber'}</h2>
           <dl>
-            {SITE.advocates.map((a) => (
-              <div>
-                <dt>{hi ? a.nameHi : a.name}</dt>
-                <dd>{hi ? a.roleHi : a.role}</dd>
-              </div>
-            ))}
+            <div>
+              <dt>{hi ? SITE.advocate.nameHi : SITE.advocate.name}</dt>
+              <dd>{hi ? SITE.advocate.roleHi : SITE.advocate.role}</dd>
+              <dd class="about-parentage">{hi ? SITE.advocate.parentageHi : SITE.advocate.parentage}</dd>
+            </div>
           </dl>
           <hr />
           <p class="about-addr">
@@ -129,6 +128,7 @@ const description = hi
   .about-card dl { margin: 0; display: grid; gap: var(--s-3); }
   .about-card dt { font-family: var(--font-display); font-size: 1.08rem; color: var(--green-900); font-weight: 600; }
   .about-card dd { margin: 0; font-size: 0.83rem; color: var(--brass-600); }
+  .about-card .about-parentage { margin-top: 4px; color: var(--ink-3); }
   .about-addr { color: var(--ink-2); }
   .about-enrol { font-size: 0.84rem; color: var(--ink-3); }
   .about-btn { width: 100%; margin-top: var(--s-2); }

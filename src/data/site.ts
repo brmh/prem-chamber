@@ -8,23 +8,25 @@ export const SITE = {
   brand: 'Prem Chamber',
   brandHi: 'प्रेम चैम्बर',
 
-  /** Advocates practising from the chamber. */
-  advocates: [
-    { name: 'Prempal Sharma', nameHi: 'प्रेमपाल शर्मा', role: 'Advocate', roleHi: 'अधिवक्ता' },
-    {
-      name: 'Ankit Bhardwaj',
-      nameHi: 'अंकित भारद्वाज',
-      role: 'Advocate & Oath Commissioner',
-      roleHi: 'अधिवक्ता एवं ओथ कमिश्नर',
-    },
-  ],
+  /** The advocate practising from the chamber. */
+  advocate: {
+    name: 'Ankit Bhardwaj',
+    nameHi: 'अंकित भारद्वाज',
+    role: 'Advocate & Oath Commissioner',
+    roleHi: 'अधिवक्ता एवं ओथ कमिश्नर',
+    parentage: 'S/o Prempal Sharma, Advocate',
+    parentageHi: 'पुत्र श्री प्रेमपाल शर्मा, अधिवक्ता',
+  },
 
   /** NAP (name / address / phone) — must match Google Business Profile character for character. */
   phone: '+918447842792',
   phoneDisplay: '+91 84478 42792',
   whatsapp: '918447842792',
-  email: 'ankit@premchamber.com',
-  emailFallback: 'advankitbh@gmail.com',
+  /**
+   * Switch this to ankit@premchamber.com once that mailbox actually exists,
+   * otherwise mail sent from the site bounces.
+   */
+  email: 'advankitbh@gmail.com',
 
   chamber: {
     line1: 'Chamber No. 15, Tehsil Compound',
