@@ -122,6 +122,24 @@ The build output in `dist/` is plain static files. Any of these work:
 build command to `npm run build` and the output directory to `dist`. Every push
 redeploys. Free SSL, fast in India.
 
+**GitHub Pages (free).** Already wired up: `.github/workflows/deploy-pages.yml`
+builds on every push to `main`. In the repository, go to **Settings → Pages** and set
+**Source** to **GitHub Actions** (not "Deploy from a branch" — the repository holds
+source, not built HTML, so a branch deploy serves nothing).
+
+A GitHub Pages *project* site is served from a sub-path, `/prem-chamber/`. The build
+handles that through two environment variables the workflow sets for it:
+
+| Variable | Effect |
+| --- | --- |
+| `SITE_URL` | Absolute origin used for canonical, hreflang and the sitemap |
+| `BASE_PATH` | Prefixed onto every internal link, asset and markdown link |
+
+Neither is set for a normal build, so `npm run build` still produces the root-served
+site for premchamber.com. Once the real domain is in use, prefer Cloudflare Pages or
+point the domain at Pages as a custom domain — either way the site is served from the
+root and no base path is involved.
+
 **Ordinary hosting (Hostinger, cPanel).** Run `npm run build` locally and upload the
 contents of `dist/` to `public_html`. Repeat on every content change.
 

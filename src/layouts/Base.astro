@@ -1,6 +1,6 @@
 ---
 import type { Lang } from '../data/site';
-import { SITE, localePath } from '../data/site';
+import { SITE, localePath, asset } from '../data/site';
 import { t } from '../i18n/ui';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
@@ -29,17 +29,19 @@ const { lang, path, title, description, ogType = 'website', jsonLd = [], noindex
 const ui = t(lang);
 const ch = SITE.chamber;
 
-const canonical = new URL(localePath(lang, path), SITE.origin).href;
-const enHref = new URL(localePath('en', path), SITE.origin).href;
-const hiHref = new URL(localePath('hi', path), SITE.origin).href;
+/** Astro.site, so a preview deployment describes itself rather than production. */
+const origin = Astro.site!.href.replace(/\/$/, '');
+const canonical = new URL(localePath(lang, path), origin).href;
+const enHref = new URL(localePath('en', path), origin).href;
+const hiHref = new URL(localePath('hi', path), origin).href;
 
 /** One LegalService record, repeated site-wide so every page can stand alone in search. */
 const business = {
   '@context': 'https://schema.org',
   '@type': 'LegalService',
-  '@id': `${SITE.origin}/#chamber`,
+  '@id': `${origin}/#chamber`,
   name: lang === 'hi' ? SITE.brandHi : SITE.brand,
-  url: SITE.origin,
+  url: origin,
   telephone: SITE.phone,
   email: SITE.email,
   priceRange: '$$',
@@ -108,9 +110,9 @@ const fontHref =
 
     <meta name="theme-color" content="#0a2f24" />
     <meta name="format-detection" content="telephone=yes" />
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-    <link rel="sitemap" href="/sitemap-index.xml" />
+    <link rel="icon" href={asset("/favicon.svg")} type="image/svg+xml" />
+    <link rel="apple-touch-icon" href={asset("/apple-touch-icon.png")} />
+    <link rel="sitemap" href={asset("/sitemap-index.xml")} />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />

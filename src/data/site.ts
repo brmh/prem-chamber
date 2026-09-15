@@ -59,22 +59,32 @@ export const SITE = {
   ratesVerifiedOn: '2026-09-15',
 
   locale: {
-    en: { code: 'en', htmlLang: 'en-IN', label: 'English', altLabel: 'हिन्दी', altHref: (p: string) => `/hi${p}` },
-    hi: { code: 'hi', htmlLang: 'hi-IN', label: 'हिन्दी', altLabel: 'English', altHref: (p: string) => p || '/' },
+    en: { htmlLang: 'en-IN' },
+    hi: { htmlLang: 'hi-IN' },
   },
 } as const;
 
 export type Lang = 'en' | 'hi';
 
-/** Prefix a root-relative path with the locale segment. */
-export function localePath(lang: Lang, path: string): string {
-  const clean = path === '/' ? '' : path.replace(/\/$/, '');
-  return lang === 'hi' ? `/hi${clean || ''}` || '/hi' : clean || '/';
+/**
+ * The configured `base`, without a trailing slash. Empty when the site is
+ * served from the root, which is the normal case; a GitHub Pages project site
+ * is served from a sub-path and sets one.
+ */
+function basePrefix(): string {
+  const b = (import.meta as { env?: { BASE_URL?: string } })?.env?.BASE_URL ?? '/';
+  return b === '/' ? '' : b.replace(/\/$/, '');
 }
 
-/** Strip the locale segment back off a pathname. */
-export function stripLocale(pathname: string): string {
-  const p = pathname.replace(/\/$/, '');
-  if (p === '/hi' || p === '/hi/') return '/';
-  return p.startsWith('/hi/') ? p.slice(3) : p || '/';
+/** Build a link: base prefix + locale segment + path. */
+export function localePath(lang: Lang, path: string): string {
+  const clean = path === '/' ? '' : path.replace(/\/$/, '');
+  const withLocale = lang === 'hi' ? `/hi${clean}` : clean;
+  return `${basePrefix()}${withLocale}` || '/';
 }
+
+/** Prefix a file in /public with the base, e.g. asset('/favicon.svg'). */
+export function asset(path: string): string {
+  return `${basePrefix()}${path}`;
+}
+

@@ -28,7 +28,7 @@ const services = d.services
   .map((slug) => SERVICES.find((s) => s.slug === slug))
   .filter((s): s is NonNullable<typeof s> => Boolean(s));
 
-const url = new URL(L(`/guides/${d.key}`), SITE.origin).href;
+const url = new URL(L(`/guides/${d.key}`), Astro.site).href;
 const fmt = (date: Date) =>
   date.toLocaleDateString(hi ? 'hi-IN' : 'en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
 
@@ -42,8 +42,8 @@ const jsonLd = [
     dateModified: d.updated.toISOString(),
     datePublished: d.updated.toISOString(),
     mainEntityOfPage: { '@type': 'WebPage', '@id': url },
-    author: { '@type': 'Organization', name: hi ? SITE.brandHi : SITE.brand, '@id': `${SITE.origin}/#chamber` },
-    publisher: { '@id': `${SITE.origin}/#chamber` },
+    author: { '@type': 'Organization', name: hi ? SITE.brandHi : SITE.brand, '@id': `${Astro.site}#chamber` },
+    publisher: { '@id': `${Astro.site}#chamber` },
   },
 ];
 ---

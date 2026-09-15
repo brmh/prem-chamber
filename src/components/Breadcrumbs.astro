@@ -1,13 +1,13 @@
 ---
 import type { Lang } from '../data/site';
-import { SITE } from '../data/site';
+import { localePath } from '../data/site';
 import { t } from '../i18n/ui';
 
 export interface Crumb { label: string; href?: string }
 interface Props { lang: Lang; items: Crumb[] }
 const { lang, items } = Astro.props;
 const ui = t(lang);
-const home = lang === 'hi' ? '/hi' : '/';
+const home = localePath(lang, '/');
 const all: Crumb[] = [{ label: ui.nav.home, href: home }, ...items];
 
 const jsonLd = {
@@ -17,7 +17,7 @@ const jsonLd = {
     '@type': 'ListItem',
     position: i + 1,
     name: c.label,
-    ...(c.href ? { item: new URL(c.href, SITE.origin).href } : {}),
+    ...(c.href ? { item: new URL(c.href, Astro.site).href } : {}),
   })),
 };
 ---

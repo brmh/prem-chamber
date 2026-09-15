@@ -31,12 +31,12 @@ const jsonLd = [
     name: c.title,
     serviceType: c.title,
     description: c.summary,
-    provider: { '@id': `${SITE.origin}/#chamber` },
+    provider: { '@id': `${Astro.site}#chamber` },
     areaServed: { '@type': 'City', name: hi ? 'गाज़ियाबाद' : 'Ghaziabad' },
     availableChannel: {
       '@type': 'ServiceChannel',
       servicePhone: SITE.phone,
-      serviceUrl: new URL(L(`/services/${service.slug}`), SITE.origin).href,
+      serviceUrl: new URL(L(`/services/${service.slug}`), Astro.site).href,
     },
   },
 ];
