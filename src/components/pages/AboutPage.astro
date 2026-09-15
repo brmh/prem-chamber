@@ -91,11 +91,20 @@ const description = hi
             <a href={`tel:${SITE.phone}`}>{SITE.phoneDisplay}</a><br />
             <a href={`mailto:${SITE.email}`}>{SITE.email}</a>
           </p>
-          {bc.enrolmentNo && (
+          {(bc.enrolmentNo || bc.practisingSince) && (
             <p class="about-enrol">
-              {hi ? bc.councilHi : bc.council}<br />
-              {ui.footer.enrolment}: {bc.enrolmentNo}
-              {bc.practisingSince && <><br />{hi ? 'नामांकन वर्ष' : 'Enrolled'}: {bc.practisingSince}</>}
+              {bc.practisingSince && (
+                <>
+                  {hi ? `${bc.practisingSince} ${ui.labels.since}` : `${ui.labels.since} ${bc.practisingSince}`}
+                  <br />
+                </>
+              )}
+              {bc.enrolmentNo && (
+                <>
+                  {hi ? bc.councilHi : bc.council}<br />
+                  {ui.footer.enrolment}: {bc.enrolmentNo}
+                </>
+              )}
             </p>
           )}
           <a class="btn btn--primary about-btn" href={L('/contact')}>{ui.cta.appointment}</a>

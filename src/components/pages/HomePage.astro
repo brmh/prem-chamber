@@ -57,6 +57,13 @@ const groupKeys = ['property', 'family', 'documents'] as const;
             <strong>{hi ? SITE.advocate.nameHi : SITE.advocate.name}</strong>
             <em>{hi ? SITE.advocate.roleHi : SITE.advocate.role}</em>
             <small>{hi ? SITE.advocate.parentageHi : SITE.advocate.parentage}</small>
+            {SITE.barCouncil.practisingSince && (
+              <small class="hero__since">
+                {hi
+                  ? `${SITE.barCouncil.practisingSince} ${ui.labels.since}`
+                  : `${ui.labels.since} ${SITE.barCouncil.practisingSince}`}
+              </small>
+            )}
           </span>
         </p>
         <hr />
@@ -224,6 +231,7 @@ const groupKeys = ['property', 'family', 'documents'] as const;
   }
   .hero__names em { display: block; font-style: normal; font-size: 0.84rem; color: var(--brass-600); }
   .hero__names small { display: block; margin-top: 5px; font-size: 0.82rem; color: var(--ink-3); }
+  .hero__names .hero__since { color: var(--brass-600); font-weight: 600; margin-top: 7px; }
   .hero__card hr { margin: var(--s-5) 0; }
   .hero__addr { font-size: 0.92rem; color: var(--ink-2); margin-bottom: var(--s-2); }
   .hero__hours { font-size: 0.84rem; color: var(--ink-3); margin: 0; }

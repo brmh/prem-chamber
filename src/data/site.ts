@@ -54,7 +54,7 @@ export const SITE = {
     council: 'Bar Council of Uttar Pradesh',
     councilHi: 'बार काउंसिल ऑफ़ उत्तर प्रदेश',
     enrolmentNo: '', // VERIFY: mandatory before publishing
-    practisingSince: '', // VERIFY: year of enrolment
+    practisingSince: '1998',
   },
 
   /** Last time the fee/rate figures in the guides were checked against the official source. */

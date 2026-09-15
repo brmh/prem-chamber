@@ -62,10 +62,22 @@ const year = new Date().getFullYear();
           {hi ? 'सोम–शनि' : 'Mon–Sat'} {SITE.hours.weekdays}
         </li>
       </ul>
-      {SITE.barCouncil.enrolmentNo && (
+      {(SITE.barCouncil.enrolmentNo || SITE.barCouncil.practisingSince) && (
         <p class="foot-enrol">
-          {ui.footer.barCouncil}: {hi ? SITE.barCouncil.councilHi : SITE.barCouncil.council}<br />
-          {ui.footer.enrolment}: {SITE.barCouncil.enrolmentNo}
+          {SITE.barCouncil.practisingSince && (
+            <>
+              {hi
+                ? `${SITE.barCouncil.practisingSince} ${ui.labels.since}`
+                : `${ui.labels.since} ${SITE.barCouncil.practisingSince}`}
+              <br />
+            </>
+          )}
+          {SITE.barCouncil.enrolmentNo && (
+            <>
+              {ui.footer.barCouncil}: {hi ? SITE.barCouncil.councilHi : SITE.barCouncil.council}<br />
+              {ui.footer.enrolment}: {SITE.barCouncil.enrolmentNo}
+            </>
+          )}
         </p>
       )}
     </div>

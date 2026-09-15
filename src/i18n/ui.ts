@@ -45,6 +45,7 @@ export const UI = {
       skip: 'Skip to main content',
       inThisSection: 'In this section',
       ratesNote: 'Fees and rates last checked on',
+      since: 'Practising since',
     },
     form: {
       heading: 'Tell us what you need',
@@ -130,6 +131,7 @@ export const UI = {
       skip: 'मुख्य सामग्री पर जाएँ',
       inThisSection: 'इस हिस्से में',
       ratesNote: 'फ़ीस और दरें आख़िरी बार जाँची गईं',
+      since: 'से प्रैक्टिस',
     },
     form: {
       heading: 'अपना काम बताइए',
