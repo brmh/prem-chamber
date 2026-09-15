@@ -54,6 +54,7 @@ src/
   data/site.ts              chamber details, address, phone — single source of truth
   data/rates.ts             stamp duty / registration figures
   data/offices.ts           Sub-Registrar offices (to be filled)
+  data/careers.ts           roles the chamber hires for, and current vacancies
   data/services/            one file per service, English + Hindi in the same file
   content/guides/en/*.md    English guides
   content/guides/hi/*.md    Hindi guides
@@ -75,6 +76,17 @@ Required frontmatter: `key`, `lang`, `title`, `metaTitle`, `description`, `answe
 `updated`, `readingTime`. Optional: `featured` (shows on the home page), `order`
 (sorting), `faqs` (becomes an FAQ block plus FAQ structured data), `sources`,
 `services`, `related`, `hasRates`.
+
+### Listing a vacancy
+
+`src/data/careers.ts` has an `OPENINGS` array that is empty by default. While it is
+empty the careers page says plainly that nothing is advertised and that applications
+are still read. Add an entry and that turns into a listed vacancy, and a `JobPosting`
+structured-data block is emitted for it so it can appear in Google's job results.
+Remove the entry once the position is filled — a stale vacancy is worse than none.
+
+No stipend figure is printed anywhere on that page, deliberately. It varies, and the
+page says it is discussed directly instead.
 
 ### Adding a service
 

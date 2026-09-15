@@ -1,0 +1,290 @@
+---
+import type { Lang } from '../../data/site';
+import { SITE, localePath } from '../../data/site';
+import { t } from '../../i18n/ui';
+import { ROLES, OPENINGS, role } from '../../data/careers';
+import Base from '../../layouts/Base.astro';
+import Breadcrumbs from '../Breadcrumbs.astro';
+import Faq from '../Faq.astro';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const ui = t(lang);
+const L = (p: string) => localePath(lang, p);
+const hi = lang === 'hi';
+const ch = SITE.chamber;
+
+const title = hi
+  ? 'चैम्बर के साथ काम — जूनियर अधिवक्ता, इंटर्न | प्रेम चैम्बर'
+  : 'Work with the Chamber — Junior Advocate & Interns | Prem Chamber';
+const description = hi
+  ? 'गाज़ियाबाद तहसील कम्पाउंड स्थित प्रेम चैम्बर में जूनियर अधिवक्ता, विधि छात्रों की इंटर्नशिप और क्लर्क/टाइपिस्ट के काम — क्या काम होता है, क्या चाहिए, और आवेदन कैसे करें।'
+  : 'Junior advocate, law student internship and clerk positions at Prem Chamber, Tehsil Compound Ghaziabad — what the work involves, what is expected, and how to apply.';
+
+const subject = hi ? 'आवेदन — प्रेम चैम्बर' : 'Application — Prem Chamber';
+const mailHref = `mailto:${SITE.email}?subject=${encodeURIComponent(subject)}`;
+const waText = hi
+  ? 'नमस्ते, मैं चैम्बर में काम के बारे में पूछना चाहता/चाहती हूँ।'
+  : 'Hello, I would like to ask about working at the chamber.';
+const waHref = `https://wa.me/${SITE.whatsapp}?text=${encodeURIComponent(waText)}`;
+
+/** Only describe a vacancy to search engines when there actually is one. */
+const jsonLd = OPENINGS.map((o) => {
+  const r = role(o.roleId);
+  if (!r) return null;
+  const c = r[lang];
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'JobPosting',
+    title: c.title,
+    description: c.work.join('. '),
+    datePosted: o.postedOn,
+    employmentType: 'FULL_TIME',
+    hiringOrganization: {
+      '@type': 'Organization',
+      name: hi ? SITE.brandHi : SITE.brand,
+      sameAs: SITE.origin,
+    },
+    jobLocation: {
+      '@type': 'Place',
+      address: {
+        '@type': 'PostalAddress',
+        streetAddress: hi ? ch.line1Hi : ch.line1,
+        addressLocality: hi ? ch.cityHi : ch.city,
+        addressRegion: hi ? ch.stateHi : ch.state,
+        postalCode: ch.pincode,
+        addressCountry: 'IN',
+      },
+    },
+  };
+}).filter((x): x is NonNullable<typeof x> => x !== null);
+
+const faqs = hi
+  ? [
+      {
+        q: 'अभी कोई पद खाली नहीं है तो क्या आवेदन भेजना बेकार है?',
+        a: 'नहीं। चैम्बर में काम की मात्रा बदलती रहती है और ज़रूरत अक्सर अचानक बनती है। भेजे गए आवेदन रखे जाते हैं, और जगह बनने पर सबसे पहले उन्हीं को देखा जाता है।',
+      },
+      {
+        q: 'क्या इंटर्नशिप का प्रमाण पत्र मिलता है?',
+        a: 'हाँ, पूरी अवधि करने पर। उसमें यह भी लिखा जाता है कि आपने असल में किन कामों पर समय दिया — कॉलेज में वही ज़्यादा काम आता है, बजाय एक सामान्य प्रमाण पत्र के।',
+      },
+      {
+        q: 'मानदेय कितना मिलेगा?',
+        a: 'यह पद और अनुभव पर निर्भर करता है और बातचीत में सीधे बता दिया जाता है — शुरू करने से पहले, बाद में नहीं। इस पेज पर कोई आँकड़ा इसलिए नहीं दिया गया कि वह हर मामले में अलग होता है।',
+      },
+      {
+        q: 'क्या दूसरे शहर से आकर इंटर्नशिप कर सकते हैं?',
+        a: 'कर सकते हैं, पर रहने की व्यवस्था आपको ख़ुद करनी होगी। चैम्बर तहसील कम्पाउंड में है, जहाँ आना-जाना गाज़ियाबाद के ज़्यादातर हिस्सों से आसान है।',
+      },
+    ]
+  : [
+      {
+        q: 'If there is no vacancy right now, is it pointless to write?',
+        a: 'No. The volume of work here moves about and the need usually appears at short notice. Applications that come in are kept, and they are the first place we look when a position opens.',
+      },
+      {
+        q: 'Is an internship certificate given?',
+        a: 'Yes, on completing the full period. It states what you actually spent time on, which is more use at college than a generic certificate.',
+      },
+      {
+        q: 'What is the stipend?',
+        a: 'It depends on the position and on experience, and it is told to you directly during the conversation — before you start, not after. No figure is printed here because it genuinely varies.',
+      },
+      {
+        q: 'Can I intern from another city?',
+        a: 'You can, but accommodation is your own arrangement. The chamber is inside the Tehsil Compound, which is straightforward to reach from most of Ghaziabad.',
+      },
+    ];
+---
+
+<Base lang={lang} path="/careers" title={title} description={description} jsonLd={jsonLd}>
+  <div class="section section--tight">
+    <div class="wrap">
+      <Breadcrumbs lang={lang} items={[{ label: ui.nav.careers }]} />
+      <h1>{hi ? 'चैम्बर के साथ काम' : 'Work with the chamber'}</h1>
+      <p class="lede" style="max-width:64ch">
+        {hi
+          ? 'यह एक छोटा चैम्बर है जो तहसील कम्पाउंड में बैठता है और ज़्यादातर रजिस्ट्री, दस्तावेज़ और संपत्ति से जुड़े काम करता है। यहाँ काम सीखने का तरीक़ा यही है कि आप उसे करते हैं — पहले दिन से फ़ाइल, कागज़ और कार्यालय।'
+          : 'This is a small chamber inside the Tehsil Compound, doing mostly registry, documentation and property work. The way you learn here is by doing it: files, papers and the office, from the first week.'}
+      </p>
+
+      {OPENINGS.length > 0 ? (
+        <div class="openings">
+          <h2>{hi ? 'अभी खाली पद' : 'Open right now'}</h2>
+          <ul>
+            {OPENINGS.map((o) => {
+              const r = role(o.roleId);
+              return r ? (
+                <li>
+                  <strong>{r[lang].title}</strong>
+                  <span>{hi ? o.noteHi : o.note}</span>
+                </li>
+              ) : null;
+            })}
+          </ul>
+        </div>
+      ) : (
+        <div class="note">
+          <span class="note__label">{hi ? 'अभी की स्थिति' : 'As things stand'}</span>
+          <p>
+            {hi
+              ? 'इस समय कोई पद विज्ञापित नहीं है। फिर भी आवेदन भेजा जा सकता है — काम की मात्रा बदलती रहती है, और ज़रूरत पड़ने पर पहले भेजे गए आवेदन ही सबसे पहले देखे जाते हैं। इंटर्नशिप के लिए साल भर कभी भी लिखा जा सकता है।'
+              : 'No position is being advertised at the moment. Writing in is still worth it — the workload moves about, and when a need comes up the applications already on file are the first place we look. For internships you can write at any time of year.'}
+          </p>
+        </div>
+      )}
+
+      <section class="roles">
+        <h2>{hi ? 'यहाँ किस तरह के काम होते हैं' : 'The kinds of work here'}</h2>
+        {ROLES.map((r) => {
+          const c = r[lang];
+          return (
+            <article class="role" id={r.id}>
+              <h3>{c.title}</h3>
+              <div class="role__cols">
+                <div>
+                  <h4>{hi ? 'दिन में क्या करना होता है' : 'What the day involves'}</h4>
+                  <ul class="checklist">
+                    {c.work.map((w) => <li>{w}</li>)}
+                  </ul>
+                </div>
+                <div>
+                  <h4>{hi ? 'क्या चाहिए' : 'What is expected'}</h4>
+                  <ul class="checklist">
+                    {c.looking.map((l) => <li>{l}</li>)}
+                  </ul>
+                </div>
+              </div>
+              <p class="role__learn">{c.learn}</p>
+            </article>
+          );
+        })}
+      </section>
+
+      <section class="apply" id="apply">
+        <h2>{hi ? 'आवेदन कैसे करें' : 'How to apply'}</h2>
+        <div class="apply__grid">
+          <div>
+            <h3>{hi ? 'क्या भेजना है' : 'What to send'}</h3>
+            <ol class="steps">
+              <li>
+                <h4>{hi ? 'अपना बायोडाटा' : 'Your CV'}</h4>
+                <p>
+                  {hi
+                    ? 'एक पन्ना काफ़ी है। पढ़ाई, नामांकन संख्या यदि हो, और जो भी काम पहले किया हो।'
+                    : 'One page is enough. Education, enrolment number if you have one, and whatever work you have already done.'}
+                </p>
+              </li>
+              <li>
+                <h4>{hi ? 'चार-पाँच लाइन का परिचय' : 'Four or five lines about yourself'}</h4>
+                <p>
+                  {hi
+                    ? 'आप किस पद के लिए लिख रहे हैं, कब से उपलब्ध हैं, और यह काम ही क्यों। बना-बनाया कवर लेटर मत भेजिए — वह पढ़ने में तुरंत पकड़ा जाता है।'
+                    : 'Which position, when you are available from, and why this work. Skip the template cover letter; it reads as one immediately.'}
+                </p>
+              </li>
+              <li>
+                <h4>{hi ? 'लिखने का एक नमूना, यदि हो' : 'A writing sample, if you have one'}</h4>
+                <p>
+                  {hi
+                    ? 'कोई मसौदा, कोई नोट, कॉलेज का कोई काम। हिंदी में हो तो और अच्छा। इससे बाक़ी सब से ज़्यादा पता चलता है।'
+                    : 'A draft, a note, something from college. Hindi is better still. It tells us more than the rest of the application does.'}
+                </p>
+              </li>
+            </ol>
+          </div>
+
+          <aside class="apply__card">
+            <h3>{hi ? 'कहाँ भेजें' : 'Where to send it'}</h3>
+            <p class="small">
+              {hi
+                ? 'ईमेल से भेजिए ताकि बायोडाटा संलग्न हो सके। कोई सवाल पूछना हो तो व्हाट्सएप ठीक है।'
+                : 'Email, so the CV can be attached. WhatsApp is fine for a question before you apply.'}
+            </p>
+            <a class="btn btn--primary apply__btn" href={mailHref}>{hi ? 'ईमेल भेजें' : 'Email the chamber'}</a>
+            <a class="btn btn--ghost apply__btn" href={waHref} rel="noopener" target="_blank">{ui.cta.whatsapp}</a>
+            <hr />
+            <p class="small">
+              {hi ? ch.line1Hi : ch.line1}<br />
+              {hi ? ch.cityHi : ch.city}, {hi ? ch.stateHi : ch.state} {ch.pincode}
+            </p>
+            <p class="small">
+              {hi
+                ? 'हर आवेदन पढ़ा जाता है। जवाब में समय लग सकता है, पर हफ़्ते भर में कुछ न सुनें तो एक बार याद दिला दीजिए।'
+                : 'Every application is read. A reply can take time, but if you hear nothing within a week, send a reminder.'}
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <Faq lang={lang} items={faqs} />
+
+      <p class="small" style="margin-top: var(--s-6); max-width: 70ch">
+        {hi
+          ? 'यह पेज भर्ती के बारे में है, मुवक्किलों के लिए नहीं। कानूनी सहायता चाहिए तो '
+          : 'This page is about recruitment, not about clients. If you need legal help, the '}
+        <a href={L('/services')}>{hi ? 'सेवाओं वाला पेज' : 'services pages'}</a>
+        {hi ? ' देखिए या चैम्बर में फ़ोन कीजिए।' : ' or a call to the chamber is the right place.'}
+      </p>
+    </div>
+  </div>
+</Base>
+
+<style>
+  .openings {
+    background: var(--green-50);
+    border-left: 3px solid var(--green-700);
+    border-radius: 0 var(--radius) var(--radius) 0;
+    padding: var(--s-5);
+    margin: var(--s-6) 0;
+  }
+  .openings h2 { margin: 0 0 var(--s-3); font-size: 1.1rem; }
+  .openings ul { list-style: none; padding: 0; margin: 0; }
+  .openings li { margin-bottom: var(--s-3); }
+  .openings strong { display: block; font-family: var(--font-display); font-size: 1.05rem; }
+  .openings span { font-size: 0.9rem; color: var(--ink-2); }
+
+  .roles { margin-top: var(--s-8); }
+  .role {
+    border-top: 1px solid var(--line);
+    padding-top: var(--s-5);
+    margin-top: var(--s-6);
+    scroll-margin-top: 90px;
+  }
+  .role h3 { margin-top: 0; }
+  .role__cols { display: grid; gap: var(--s-5); }
+  @media (min-width: 800px) { .role__cols { grid-template-columns: 1.3fr 1fr; gap: var(--s-7); } }
+  .role h4 {
+    font-family: var(--font-body);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--brass-600);
+    margin-top: 0;
+  }
+  :global([lang='hi']) .role h4 { letter-spacing: 0.02em; text-transform: none; font-size: 0.84rem; }
+  .role li { font-size: 0.93rem; color: var(--ink-2); }
+  .role__learn {
+    margin-top: var(--s-4);
+    padding-left: var(--s-4);
+    border-left: 3px solid var(--brass-300);
+    color: var(--ink-2);
+    max-width: 72ch;
+  }
+
+  .apply { margin-top: var(--s-8); }
+  .apply__grid { display: grid; gap: var(--s-6); align-items: start; }
+  @media (min-width: 900px) { .apply__grid { grid-template-columns: 1.4fr 1fr; gap: var(--s-8); } }
+  .apply h3 { margin-top: 0; font-size: 1.1rem; }
+  .apply__card {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-top: 3px solid var(--brass-500);
+    border-radius: var(--radius);
+    padding: var(--s-5);
+  }
+  .apply__btn { width: 100%; margin-top: var(--s-3); }
+  .apply__card hr { margin: var(--s-5) 0; }
+</style>
